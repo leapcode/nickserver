@@ -20,13 +20,6 @@ class ServerTest < MiniTest::Unit::TestCase
         puts http.error
         EM.stop
       }
-
-      #socket = EM.connect('0.0.0.0', Nickserver::Config.port, TestSocketClient)
-      #socket.onopen = lambda {
-      #  server.players.size.should == 1
-      #  socket.data.last.chomp.should == "READY"
-      #  EM.stop
-      #}
     end
   end
 
