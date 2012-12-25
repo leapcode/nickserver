@@ -9,7 +9,7 @@ public key information for that nick.
 Nickserver has the following properties:
 
 * Written in Ruby, licensed GPLv3
-* Lightweight and scalable
+* Lightweight and scalable (high concurrency, reasonable latency)
 * Uses asynchronous network IO for both server and client connections (via EventMachine)
 * Attempts to reply to queries using four different methods:
   * Cached key in CouchDB (coming soon)
@@ -45,7 +45,7 @@ You query the nickserver via HTTP. The API is very minimal at the moment:
 
     curl -X GET hostname:6425/key/<uid>
 
-Returns the OpenPGP public key for uid.
+Returns the OpenPGP public key for uid (ascii encoded).
 
 Installation
 ==================================
@@ -72,6 +72,23 @@ Install for development:
 Usage
 ==================================
 
-None yet, just a bunch of unit tests.
+    Usage: nickserver <command> <options> -- <application options>
 
-    rake test
+    * where <command> is one of:
+      start         start an instance of the application
+      stop          stop all instances of the application
+      restart       stop all instances and restart them afterwards
+      reload        send a SIGHUP to all instances of the application
+      run           start the application and stay on top
+      zap           set the application to a stopped state
+      status        show status (PID) of application instances
+
+    * and where <options> may contain several of the following:
+
+        -t, --ontop                      Stay on top (does not daemonize)
+        -f, --force                      Force operation
+        -n, --no_wait                    Do not wait for processes to stop
+
+    Common options:
+        -h, --help                       Show this message
+            --version                    Show version
