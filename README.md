@@ -1,60 +1,39 @@
 Nickserver
 ==================================
 
-Nickserver is the opposite of a key server. A key server allows you to lookup
-keys, and the UIDs associated with a particular key. A nickserver allows you
-to query a particular 'nick' (e.g. username@example.org) and get back relevant
-public key information for that nick.
+Nickserver is a server running the Nicknym protocol. This daemon can be run by service providers in order to support Nicknym.
 
-Nickserver has the following properties:
+Nicknym is a protocol to map user nicknames to public keys. With Nicknym, the user is able to think solely in terms of nickname, while still being able to communicate with a high degree of security (confidentiality, integrity, and authenticity). Essentially, Nicknym is a system for binding human-memorable nicknames to a cryptographic key via automatic discovery and automatic validation.
 
-* Written in Ruby, licensed GPLv3
+For more information, see https://leap.se/nicknym
+
+About nickserver:
+
+* Written in Ruby 1.9, licensed GPLv3
 * Lightweight and scalable (high concurrency, reasonable latency)
 * Uses asynchronous network IO for both server and client connections (via EventMachine)
-* Attempts to reply to queries using four different methods:
-  * Cached key in CouchDB (coming soon)
-  * Webfinger (coming soon)
-  * DNS (maybe?)
-  * HKP keyserver pool (https://hkps.pool.sks-keyservers.net)
-
-Why Nickserver?
-----------------------------------
-
-Why bother writing Nickserver instead of just using the existing HKP keyservers?
-
-* Keyservers are fundamentally different: Nickserver is a registry of 1:1
-  mapping from nick (uid) to public key. Keyservers are directories of public
-  keys, which happen to have some uid information in the subkeys, but there is
-  no way to query for an exact uid.
-
-* Support clients: the goal is to provide clients with a cloud-based method of
-  rapidly and easily converting nicks to keys. Client code can stay simple by
-  pushing more of the work to the server.
-
-* Enhancements over keyservers: the goal with Nickserver is to support future
-  enhancements like webfinger, DNS key lookup, mail-back verification, network
-  perspective, and fast distribution of short lived keys.
-
-* Scalable: the goal is for a service that can handle many simultaneous
-  requests very quickly with low memory consumption.
 
 API
 ==================================
 
-You query the nickserver via HTTP. The API is very minimal at the moment:
+You query the nickserver via HTTP. The API is very minimal:
 
-    curl -X GET hostname:6425/key/<uid>
+    curl -X POST -d address=alice@domain.org https://nicknym.domain.org:6425
 
-Returns the OpenPGP public key for uid (ascii encoded).
+The response consists of a signed JSON document with fields for the available public keys corresponding to the address.
+
+For more details, see https://leap.se/nicknym
+
+Requirements
+==================================
+
+Ruby 1.9
+CouchDB
 
 Installation
 ==================================
 
 You have three fine options for installing nickserver:
-
-Install the gem:
-
-    $ gem install nickserver
 
 Install from source:
 
@@ -68,6 +47,7 @@ Install for development:
     $ git clone git://leap.se/nickserver
     $ cd nickserver
     $ bundle
+    $ rake test
 
 Usage
 ==================================
