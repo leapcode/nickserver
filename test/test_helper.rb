@@ -9,6 +9,8 @@ class MiniTest::Unit::TestCase
   # Add global extensions to the test case class here
 
   def setup
+    Nickserver::Config.load
+
     # by default, mock all non-localhost network connections
     WebMock.disable_net_connect!(:allow_localhost => true)
   end
@@ -25,17 +27,25 @@ class MiniTest::Unit::TestCase
     end
   end
 
-  def stub_vindex_response(uid, opts = {})
+  def stub_sks_vindex_reponse(uid, opts = {})
     options = {:status => 200, :body => ""}.merge(opts)
     stub_http_request(:get, Nickserver::Config.sks_url).with(
       :query => {:op => 'vindex', :search => uid, :exact => 'on', :options => 'mr', :fingerprint => 'on'}
     ).to_return(options)
   end
 
-  def stub_get_response(key_id, opts = {})
+  def stub_sks_get_reponse(key_id, opts = {})
     options = {:status => 200, :body => ""}.merge(opts)
     stub_http_request(:get, Nickserver::Config.sks_url).with(
       :query => {:op => 'get', :search => "0x"+key_id, :exact => 'on', :options => 'mr'}
+    ).to_return(options)
+  end
+
+  def stub_couch_response(uid, opts = {})
+    options = {:status => 200, :body => ""}.merge(opts)
+    url = ['http://', Nickserver::Config.couch_host, ':', Nickserver::Config.couch_port].join
+    stub_http_request(:get, url).with(
+      :query => {:address => uid}
     ).to_return(options)
   end
 
