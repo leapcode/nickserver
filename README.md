@@ -49,6 +49,11 @@ Install for development:
     $ bundle
     $ rake test
 
+Configuration
+==================================
+
+Nickserver loads the configuration files `config/default.yml` and `/etc/leap/nickserver.yml`, if it exists. See `config/default.yml` for the available options.
+
 Usage
 ==================================
 
