@@ -1,5 +1,10 @@
 require 'em-http'
 
+#
+# Fetch keys via HKP
+# http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00
+#
+
 module Nickserver; module HKP
 
   class FetchKey
@@ -22,7 +27,7 @@ module Nickserver; module HKP
     #
     def get_key_by_fingerprint(key_id)
       params = {:op => 'get', :search => "0x" + key_id, :exact => 'on', :options => 'mr'}
-      http = EventMachine::HttpRequest.new(Config.sks_url).get(:query => params)
+      http = EventMachine::HttpRequest.new(Config.hkp_url).get(:query => params)
       http.callback {
         if http.response_header.status != 200
           self.fail http.response_header.status #"Request failed with #{http.response_header.status}: #{http.response}"

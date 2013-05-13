@@ -29,14 +29,14 @@ class MiniTest::Unit::TestCase
 
   def stub_sks_vindex_reponse(uid, opts = {})
     options = {:status => 200, :body => ""}.merge(opts)
-    stub_http_request(:get, Nickserver::Config.sks_url).with(
+    stub_http_request(:get, Nickserver::Config.hkp_url).with(
       :query => {:op => 'vindex', :search => uid, :exact => 'on', :options => 'mr', :fingerprint => 'on'}
     ).to_return(options)
   end
 
   def stub_sks_get_reponse(key_id, opts = {})
     options = {:status => 200, :body => ""}.merge(opts)
-    stub_http_request(:get, Nickserver::Config.sks_url).with(
+    stub_http_request(:get, Nickserver::Config.hkp_url).with(
       :query => {:op => 'get', :search => "0x"+key_id, :exact => 'on', :options => 'mr'}
     ).to_return(options)
   end

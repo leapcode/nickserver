@@ -8,7 +8,7 @@ module Nickserver
     ]
 
     class << self
-      attr_accessor :sks_url
+      attr_accessor :hkp_url
       attr_accessor :couch_port
       attr_accessor :couch_host
       attr_accessor :couch_database
