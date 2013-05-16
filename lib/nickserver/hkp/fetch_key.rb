@@ -16,8 +16,8 @@ module Nickserver; module HKP
         get_key_by_fingerprint(best.keyid) {|key|
           self.succeed key
         }
-      }.errback {|msg|
-        self.fail msg
+      }.errback {|status, msg|
+        self.fail status, msg
       }
       self
     end
@@ -30,13 +30,13 @@ module Nickserver; module HKP
       http = EventMachine::HttpRequest.new(Config.hkp_url).get(:query => params)
       http.callback {
         if http.response_header.status != 200
-          self.fail http.response_header.status #"Request failed with #{http.response_header.status}: #{http.response}"
+          self.fail http.response_header.status, "HKP Request failed"
         else
           yield http.response
         end
       }
       http.errback {
-        self.fail http.error
+        self.fail 0, http.error
       }
     end
 

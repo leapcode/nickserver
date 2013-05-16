@@ -1,6 +1,21 @@
 require File.expand_path('test_helper', File.dirname(__FILE__))
 require 'json'
 
+#
+# Some important notes to understanding these tests:
+#
+# (1) Requests to localhost always bypass HTTP stub.
+#
+# (2) All requests to nickserver are to localhost.
+#
+# (3) the "Host" header for requests to nickserver must be set, because this
+# is how it decides if a request is local. I am not happy about this design,
+# but that is how it works for now.
+#
+# (4) When stubbing requests to couchdb, the couchdb host is changed from the
+# default (localhost) to a dummy value (notlocalhost).
+#
+
 class NickserverTest < MiniTest::Unit::TestCase
 
   def test_GET_served_via_SKS
@@ -34,15 +49,29 @@ class NickserverTest < MiniTest::Unit::TestCase
   end
 
   def test_GET_served_via_couch_not_found
-    uid    = 'bananas@localhost'
-    key_id = 'E818C478D3141282F7590D29D041EB11B1647490'
-    stub_couch_response(uid, :body => file_content(uid))
+    domain = "example.org"
+    uid    = "bananas@" + domain
+    stub_couch_response(uid, :status => 404) do
+      start do
+        params = {:query => {"address" => uid}, :head => {:host => domain}}
+        get(params) do |http|
+          assert_equal 404, http.response_header.status
+          stop
+        end
+      end
+    end
+  end
 
-    start do
-      params = {:query => {"address" => uid}}
-      get(params) do |http|
-        assert_equal 404, http.response_header.status
-        stop
+  def test_GET_served_via_couch_success
+    domain = "example.org"
+    uid    = "blue@" + domain
+    stub_couch_response(uid, :body => file_content(:blue_couchdb_result)) do
+      start do
+        params = {:query => {"address" => uid}, :head => {:host => domain}}
+        get(params) do |http|
+          assert_equal file_content(:blue_nickserver_result), http.response
+          stop
+        end
       end
     end
   end
@@ -61,7 +90,7 @@ class NickserverTest < MiniTest::Unit::TestCase
       end
     end
   rescue Timeout::Error
-    flunk 'Eventmachine was not stopped before the timeout expired'
+    flunk 'EventMachine was not stopped before the timeout expired'
   end
 
   #
@@ -84,14 +113,12 @@ class NickserverTest < MiniTest::Unit::TestCase
   # this works because http requests to localhost are not stubbed, but requests to other domains are.
   #
   def request(method, params)
-    http = EventMachine::HttpRequest.new("http://localhost:#{Nickserver::Config.port}/").send(method,params)
-
-    http.callback {
+    EventMachine::HttpRequest.new("http://localhost:#{Nickserver::Config.port}/").send(method,params).callback {|http|
       # p http.response_header.status
       # p http.response_header
       # p http.response
       yield http
-    }.errback {
+    }.errback {|http|
       flunk(http.error) if http.error
       EM.stop
     }

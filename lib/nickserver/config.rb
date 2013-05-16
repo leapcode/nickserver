@@ -12,6 +12,8 @@ module Nickserver
       attr_accessor :couch_port
       attr_accessor :couch_host
       attr_accessor :couch_database
+      attr_accessor :couch_user
+      attr_accessor :couch_password
       attr_accessor :port
       attr_accessor :loaded
     end

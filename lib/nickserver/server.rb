@@ -5,6 +5,8 @@ require 'json'
 #
 # This is the main HTTP server that clients connect to in order to fetch keys
 #
+# For info on EM::HttpServer, see https://github.com/eventmachine/evma_httpserver
+#
 module Nickserver
   class Server < EM::Connection
     include EM::HttpServer
@@ -43,7 +45,7 @@ module Nickserver
       send_response(:status => 500, :content => msg)
     end
 
-    def send_not_found(msg = "not found")
+    def send_not_found(msg = "404 Not Found")
       send_response(:status => 404, :content => msg)
     end
 
@@ -74,15 +76,20 @@ module Nickserver
     end
 
     def get_key_from_uid(uid)
-      if local_address?(uid)
-        send_not_found
+      fetcher = if local_address?(uid)
+        Nickserver::Couch::FetchKey.new
       else
-        Nickserver::HKP::FetchKey.new.get(uid).callback {|key|
-          yield key
-        }.errback {|status|
-          send_response(:status => status, :content => 'could not fetch key')
-        }
+        Nickserver::HKP::FetchKey.new
       end
+      fetcher.get(uid).callback {|key|
+        yield key
+      }.errback {|status, msg|
+        if status == 404
+          send_not_found
+        else
+          send_response(:status => status, :content => msg)
+        end
+      }
     end
 
     def format_response(map)

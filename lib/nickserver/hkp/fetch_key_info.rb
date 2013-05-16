@@ -17,12 +17,12 @@ module Nickserver; module HKP
       params = {:op => 'vindex', :search => uid, :exact => 'on', :options => 'mr', :fingerprint => 'on'}
       EventMachine::HttpRequest.new(Config.hkp_url).get(:query => params).callback {|http|
         if http.response_header.status != 200
-          self.fail http.response_header.status
+          self.fail http.response_header.status, "Could net fetch keyinfo"
         else
           self.succeed parse(uid, http.response)
         end
       }.errback {|http|
-        self.fail http.error
+        self.fail 0, http.error
       }
       self
     end
