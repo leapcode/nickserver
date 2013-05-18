@@ -15,7 +15,12 @@ module Nickserver
       attr_accessor :couch_user
       attr_accessor :couch_password
       attr_accessor :port
+      attr_accessor :pid_file
+      attr_accessor :user
+      attr_accessor :log_file
+
       attr_accessor :loaded
+      attr_accessor :verbose
     end
 
     def self.load
@@ -39,9 +44,9 @@ module Nickserver
             exit(1)
           end
         end
-        puts "Loaded #{file_path}"
+        puts "Loaded #{file_path}" if Config.verbose
       rescue Errno::ENOENT => exc
-        puts "Skipping #{file_path}"
+        puts "Skipping #{file_path}" if Config.verbose
       rescue Exception => exc
         STDERR.puts exc.inspect
         exit(1)

@@ -27,8 +27,8 @@ For more details, see https://leap.se/nicknym
 Requirements
 ==================================
 
-Ruby 1.9
-CouchDB
+* Ruby 1.9
+* CouchDB
 
 Installation
 ==================================
@@ -59,23 +59,14 @@ The default HKP host is set to https://hkps.pool.sks-keyservers.net. The CA for 
 Usage
 ==================================
 
-    Usage: nickserver <command> <options> -- <application options>
+    Usage: nickserver [OPTION] COMMAND
 
-    * where <command> is one of:
+    where COMMAND is one of:
       start         start an instance of the application
       stop          stop all instances of the application
       restart       stop all instances and restart them afterwards
-      reload        send a SIGHUP to all instances of the application
-      run           start the application and stay on top
-      zap           set the application to a stopped state
       status        show status (PID) of application instances
+      version       print version and exit
 
-    * and where <options> may contain several of the following:
-
-        -t, --ontop                      Stay on top (does not daemonize)
-        -f, --force                      Force operation
-        -n, --no_wait                    Do not wait for processes to stop
-
-    Common options:
-        -h, --help                       Show this message
-            --version                    Show version
+    where OPTION is one of:
+      --verbose     log more

@@ -1,4 +1,5 @@
 #!/usr/bin/ruby
+
 #
 # Nickserver key discovery daemon
 #
@@ -19,39 +20,7 @@ rescue LoadError
   end
 end
 
-#
-# Handle craceful Ctrl-C
-#
-Signal.trap("SIGINT") do
-  puts "\nQuit"
-  exit
-end
-
-#
-# Handle '--version' ourselves
-#
-if ARGV.grep(/--version/).any?
-  puts "nickserver #{Nickserver::VERSION}, ruby #{RUBY_VERSION}"
-  exit(0)
-end
-
-#
-# Start the daemon
-#
-require 'daemons'
-
-options = {:app_name => 'nickserver', :multiple => false, :backtrace => true}
-
-# pick where the pid file should go (must be readable/writable by current user)
-if File.writable?('/var/run/nickserver')
-  options.merge!(:dir_mode => :normal, :dir => '/var/run/nickserver')
-elsif ENV["USER"] == "root"
-  options.merge!(:dir_mode => :system)
-else
-  options.merge!(:dir_mode => :normal, :dir => '/tmp')
-end
-
-Daemons.run_proc('nickserver', options) do
+Nickserver::Daemon.run do
   EventMachine.run do
     Nickserver::Server.start
   end

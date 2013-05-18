@@ -24,5 +24,4 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'eventmachine'
   gem.add_dependency 'em-http-request'
   gem.add_dependency 'eventmachine_httpserver'
-  gem.add_dependency 'daemons'
 end
