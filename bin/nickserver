@@ -4,21 +4,26 @@
 # Nickserver key discovery daemon
 #
 
-#
-# bootstrap nickserver library
-#
-begin                      # try without rubygems (might be already loaded or not present)
-  require 'nickserver'
-rescue LoadError
-  begin                    # try with rubygems
-    require 'rubygems'
-    require 'nickserver'
-  rescue LoadError         # try manually
-    BASE_DIR = File.expand_path('../..', File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__)
-    $LOAD_PATH << "#{BASE_DIR}/lib"
-    require "nickserver"
+def load_library(name)
+  begin                      # try without rubygems (might be already loaded or not present)
+    require name
+  rescue LoadError
+    begin                    # try it as a gem
+      require 'rubygems'
+      require name
+    rescue LoadError         # try manually
+      base_directory = File.expand_path('../..', File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__)
+      if File.exists?("#{base_directory}/Gemfile.lock")
+        require 'bundler'
+        Bundler.require(:default)
+      end
+      $LOAD_PATH << "#{base_directory}/lib"
+      require name
+    end
   end
 end
+
+load_library('nickserver')
 
 Nickserver::Daemon.run('nickserver') do
   EventMachine.run do
