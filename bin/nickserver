@@ -20,7 +20,7 @@ rescue LoadError
   end
 end
 
-Nickserver::Daemon.run do
+Nickserver::Daemon.run('nickserver') do
   EventMachine.run do
     Nickserver::Server.start
   end

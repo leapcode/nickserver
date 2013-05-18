@@ -8,11 +8,12 @@ require 'fileutils'
 module Nickserver
   class Daemon
 
-    def self.run(&block)
-      self.new.run(&block)
+    def self.run(name, &block)
+      self.new.run(name, &block)
     end
 
-    def run(&block)
+    def run(name, &block)
+      @name = name
       parse_options
       Config.load
       send("command_#{@command}", &block)
@@ -70,14 +71,6 @@ module Nickserver
         File.umask 0000
         yield
       end
-
-      if until_true { daemon_running? }
-        puts "Daemon has started successfully"
-        exit(0)
-      else # Failed to start
-        puts "Daemon couldn't be started"
-        exit(1)
-      end
     end
 
     def create_pid_file(file, user)
@@ -116,7 +109,7 @@ module Nickserver
         pid = pid_from_file(file)
         if pid
           Process.kill('TERM', pid)
-          puts "Stopped #{pid}"
+          puts "Stopped #{@name} process #{pid}."
         else
           bail "Error reading pid file #{file}"
         end
@@ -152,7 +145,7 @@ module Nickserver
     def usage(msg)
       puts msg
       puts
-      puts "Usage: nickserver [OPTION] COMMAND"
+      puts "Usage: #{@name} [OPTION] COMMAND"
       puts "COMMAND is one of: start, stop, restart, status, version"
       puts "OPTION is one of: --verbose"
       puts
@@ -160,7 +153,7 @@ module Nickserver
     end
 
     def bail(msg)
-      puts "Nickserver ERROR: #{msg}."
+      puts "#{@name.capitalize} ERROR: #{msg}."
       puts "Bailing out."
       exit(1)
     end
@@ -232,6 +225,13 @@ module Nickserver
 
     def command_start(&block)
       daemonize(&block)
+      if until_true { daemon_running? }
+        puts "#{@name.capitalize} started successfully."
+        exit(0)
+      else # Failed to start
+        puts "#{@name.capitalize} couldn't be started."
+        exit(1)
+      end
     end
 
     def command_stop
@@ -239,7 +239,7 @@ module Nickserver
         kill_pid
         until_true { !daemon_running? }
       else
-        puts "No processes are running"
+        puts "No #{@name} processes are running."
       end
     end
 
@@ -250,9 +250,9 @@ module Nickserver
 
     def command_status
       if daemon_running?
-        puts "Process id #{pid_from_file(Config.pid_file)}"
+        puts "#{@name.capitalize} running, process id #{pid_from_file(Config.pid_file)}."
       else
-        puts 'Not running'
+        puts "No #{@name} processes are running."
       end
     end
 
