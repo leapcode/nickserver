@@ -29,15 +29,19 @@ fi
 case "$1" in
   start)
     $DAEMON $OPTIONS start
+    exit $?
     ;;
   stop)
     $DAEMON $OPTIONS stop
+    exit $?
     ;;
   restart)
     $DAEMON $OPTIONS restart
+    exit $?
     ;;
   status)
     $DAEMON $OPTIONS status
+    exit $?
     ;;
   *)
     echo "Usage: /etc/init.d/$NAME {start|stop|restart|status}"

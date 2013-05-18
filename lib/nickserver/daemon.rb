@@ -251,8 +251,10 @@ module Nickserver
     def command_status
       if daemon_running?
         puts "#{@name.capitalize} running, process id #{pid_from_file(Config.pid_file)}."
+        exit(0)
       else
         puts "No #{@name} processes are running."
+        exit(1) # must exit non-zero if not running
       end
     end
 
