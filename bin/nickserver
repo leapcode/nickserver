@@ -11,9 +11,10 @@ def load_library(name)
     begin                    # try it as a gem
       require 'rubygems'
       require name
-    rescue LoadError         # try manually
+    rescue LoadError         # try manually, requiring gems in Gemfile if it exists.
       base_directory = File.expand_path('../..', File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__)
       if File.exists?("#{base_directory}/Gemfile.lock")
+        ENV['BUNDLE_GEMFILE'] ||= "#{base_directory}/Gemfile"
         require 'bundler'
         Bundler.require(:default)
       end
