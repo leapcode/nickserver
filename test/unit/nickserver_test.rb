@@ -74,6 +74,15 @@ class NickserverTest < MiniTest::Unit::TestCase
     end
   end
 
+  def test_GET_empty
+    start do
+      get({}) do |http|
+        assert_equal "404 Not Found\n", http.response
+        stop
+      end
+    end
+  end
+
   protected
 
   #

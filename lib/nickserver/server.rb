@@ -72,8 +72,10 @@ module Nickserver
       elsif @http_post_content
         params = CGI.parse(@http_post_content)
       end
-      if params["address"] && params["address"].any?
+      if params && params["address"] && params["address"].any?
         return params["address"].first
+      else
+        return nil
       end
     end
 
