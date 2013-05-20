@@ -1,10 +1,24 @@
+#
+# nickserver daemon
+#
+port: 6425
+pid_file: '/tmp/nickserver.pid'
+log_file: '/tmp/nickserver.log'
+user: ~
+domain: ~
+domains: ~
+
+#
+# couch
+#
 couch_host: 'localhost'
 couch_port: 5984
 couch_database: 'users'
-#couch_user: 'nickserver'
-#couch_password: 'blahblah'
+couch_user: ~
+couch_password: ~
+
+#
+# HKP
+#
 hkp_url: 'https://hkps.pool.sks-keyservers.net:/pks/lookup'
-port: 6425
-pid_file: '/var/run/nickserver'
-user: 'nobody'
-log_file: '/var/log/nickserver.log'
+

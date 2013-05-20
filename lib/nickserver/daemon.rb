@@ -67,7 +67,7 @@ module Nickserver
         create_pid_file(Config.pid_file, Config.user)
         catch_interrupt
         redirect_output
-        drop_permissions_to(Config.user)
+        drop_permissions_to(Config.user) if Config.user
         File.umask 0000
         yield
       end
@@ -77,7 +77,7 @@ module Nickserver
       File.open file, 'w' do |f|
         f.write("#{Process.pid}\n")
       end
-      FileUtils.chown(user, nil, file)
+      FileUtils.chown(user, nil, file) if Process::Sys.getuid == 0
     rescue Errno::EACCES
       bail "insufficient permission to create to pid file `#{file}`"
     rescue Errno::ENOENT
@@ -207,11 +207,20 @@ module Nickserver
           when 'status'    then ARGV.shift; @command = :status
           when 'version'   then ARGV.shift; @command = :version
           when '--verbose' then ARGV.shift; Config.versbose = true
-          when /^-/        then usage("Unknown option: #{ARGV[0].inspect}")
+          when /^-/        then override_default_config(ARGV.shift, ARGV.shift)
           else break
         end
       end
       usage("Missing command") unless @command
+    end
+
+    def override_default_config(flag, value)
+      flag = flag.sub /^--/, ''
+      if Config.respond_to?("#{flag}=")
+        Config.send("#{flag}=", value)
+      else
+        usage("Unknown option: --#{flag}")
+      end
     end
 
     #

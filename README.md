@@ -1,9 +1,15 @@
 Nickserver
 ==================================
 
-Nickserver is a server running the Nicknym protocol. This daemon can be run by service providers in order to support Nicknym.
+Nickserver is a server running the Nicknym protocol. This daemon can be run by
+service providers in order to support Nicknym.
 
-Nicknym is a protocol to map user nicknames to public keys. With Nicknym, the user is able to think solely in terms of nickname, while still being able to communicate with a high degree of security (confidentiality, integrity, and authenticity). Essentially, Nicknym is a system for binding human-memorable nicknames to a cryptographic key via automatic discovery and automatic validation.
+Nicknym is a protocol to map user nicknames to public keys. With Nicknym, the
+user is able to think solely in terms of nickname, while still being able to
+communicate with a high degree of security (confidentiality, integrity, and
+authenticity). Essentially, Nicknym is a system for binding human-memorable
+nicknames to a cryptographic key via automatic discovery and automatic
+validation.
 
 For more information, see https://leap.se/nicknym
 
@@ -20,7 +26,8 @@ You query the nickserver via HTTP. The API is very minimal:
 
     curl -X POST -d address=alice@domain.org https://nicknym.domain.org:6425
 
-The response consists of a signed JSON document with fields for the available public keys corresponding to the address.
+The response consists of a signed JSON document with fields for the available
+public keys corresponding to the address.
 
 For more details, see https://leap.se/nicknym
 
@@ -34,6 +41,13 @@ Installation
 ==================================
 
 You have three fine options for installing nickserver:
+
+Install prerequisites
+
+    $ sudo apt-get install ruby1.9.1-dev libssl-dev
+
+Note: libssl-dev must be installed before installing the gem EventMachine,
+otherwise the gem will get built without TLS support.
 
 Install from source:
 
@@ -52,9 +66,13 @@ Install for development:
 Configuration
 ==================================
 
-Nickserver loads the configuration files `config/default.yml` and `/etc/leap/nickserver.yml`, if it exists. See `config/default.yml` for the available options.
+Nickserver loads the configuration files `config/default.yml` and
+`/etc/leap/nickserver.yml`, if it exists. See `config/default.yml` for the
+available options.
 
-The default HKP host is set to https://hkps.pool.sks-keyservers.net. The CA for this pool is available here https://sks-keyservers.net/sks-keyservers.netCA.pem
+The default HKP host is set to https://hkps.pool.sks-keyservers.net. The CA
+for this pool is available here https://sks-keyservers.net/sks-
+keyservers.netCA.pem
 
 Usage
 ==================================

@@ -18,6 +18,8 @@ module Nickserver
       attr_accessor :pid_file
       attr_accessor :user
       attr_accessor :log_file
+      attr_accessor :domain
+      attr_accessor :domains
 
       attr_accessor :loaded
       attr_accessor :verbose

@@ -21,7 +21,7 @@ module Nickserver
     #
     def self.start(opts={})
       Nickserver::Config.load
-      options = {:host => '0.0.0.0', :port => Nickserver::Config.port}.merge(opts)
+      options = {:host => '0.0.0.0', :port => Nickserver::Config.port.to_i}.merge(opts)
       EM.start_server options[:host], options[:port], Nickserver::Server
     end
 
@@ -34,6 +34,8 @@ module Nickserver
       uid = get_uid_from_request
       if uid.nil?
         send_not_found
+      elsif uid !~ EmailAddress
+        send_error("Not a valid address")
       else
         send_key(uid)
       end
@@ -42,11 +44,11 @@ module Nickserver
     private
 
     def send_error(msg = "not supported")
-      send_response(:status => 500, :content => msg)
+      send_response(:status => 500, :content => "500 #{msg}\n")
     end
 
-    def send_not_found(msg = "404 Not Found")
-      send_response(:status => 404, :content => msg)
+    def send_not_found(msg = "Not Found")
+      send_response(:status => 404, :content => "404 #{msg}\n")
     end
 
     def send_response(opts = {})
@@ -100,14 +102,24 @@ module Nickserver
     # Return true if the user address is for a user of this service provider.
     # e.g. if the provider is example.org, then alice@example.org returns true.
     #
-    # Currently, we rely on whatever hostname the client voluntarily specifies
-    # in the headers of the http request.
+    # If 'domain' is not configured, we rely on the Host header of the HTTP request.
     #
     def local_address?(uid)
-      hostname = @http_headers.split(/\0/).grep(/^Host: /).first.split(':')[1].strip.sub(/^nicknym\./, '')
-      return uid =~ /^.*@#{Regexp.escape(hostname)}$/
-    #rescue
-    #  false
+      uid_domain = uid.sub(/^.*@(.*)$/, "\\1")
+      if Config.domain
+        return uid_domain == Config.domain
+      else
+        # no domain configured, use Host header
+        host_header = @http_headers.split(/\0/).grep(/^Host: /).first
+        if host_header.nil?
+          send_error("HTTP request must include a Host header.")
+        else
+          host = host_header.split(':')[1].strip.sub(/^nicknym\./, '')
+          return uid_domain == host
+        end
+      end
+    rescue
+      return false
     end
   end
 end

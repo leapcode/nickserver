@@ -1,6 +1,7 @@
 
 require "nickserver/version"
 require "nickserver/config"
+require "nickserver/email_address"
 
 require "nickserver/couch/fetch_key"
 

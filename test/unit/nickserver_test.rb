@@ -8,9 +8,7 @@ require 'json'
 #
 # (2) All requests to nickserver are to localhost.
 #
-# (3) the "Host" header for requests to nickserver must be set, because this
-# is how it decides if a request is local. I am not happy about this design,
-# but that is how it works for now.
+# (3) the "Host" header for requests to nickserver must be set (or Config.domain set)
 #
 # (4) When stubbing requests to couchdb, the couchdb host is changed from the
 # default (localhost) to a dummy value (notlocalhost).
