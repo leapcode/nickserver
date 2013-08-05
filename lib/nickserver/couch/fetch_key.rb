@@ -37,7 +37,7 @@ module Nickserver; module Couch
 
     def parse_key_from_response(uid, response)
       json = JSON.load(response)
-      if json["offset"] == 0
+      if json["rows"].empty?
         self.fail 404, "Not Found"
       else
         return json["rows"].first["value"]

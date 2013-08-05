@@ -60,6 +60,20 @@ class NickserverTest < MiniTest::Unit::TestCase
     end
   end
 
+  def test_GET_served_via_couch_empty_results
+    domain = "example.org"
+    uid    = "stompy@" + domain
+    stub_couch_response(uid, :body => file_content(:empty_couchdb_result)) do
+      start do
+        params = {:query => {"address" => uid}, :head => {:host => domain}}
+        get(params) do |http|
+          assert_equal 404, http.response_header.status
+          stop
+        end
+      end
+    end
+  end
+
   def test_GET_served_via_couch_success
     domain = "example.org"
     uid    = "blue@" + domain
