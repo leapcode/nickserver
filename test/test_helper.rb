@@ -5,6 +5,8 @@ require 'minitest/autorun'
 require 'webmock/minitest'
 require 'nickserver'
 
+TESTING = true
+
 class MiniTest::Unit::TestCase
   # Add global extensions to the test case class here
 

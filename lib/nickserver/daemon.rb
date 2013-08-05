@@ -146,7 +146,7 @@ module Nickserver
       puts msg
       puts
       puts "Usage: #{@name} [OPTION] COMMAND"
-      puts "COMMAND is one of: start, stop, restart, status, version"
+      puts "COMMAND is one of: start, stop, restart, status, version, foreground"
       puts "OPTION is one of: --verbose"
       puts
       exit 1
@@ -201,13 +201,14 @@ module Nickserver
     def parse_options
       loop do
         case ARGV[0]
-          when 'start'     then ARGV.shift; @command = :start
-          when 'stop'      then ARGV.shift; @command = :stop
-          when 'restart'   then ARGV.shift; @command = :restart
-          when 'status'    then ARGV.shift; @command = :status
-          when 'version'   then ARGV.shift; @command = :version
-          when '--verbose' then ARGV.shift; Config.versbose = true
-          when /^-/        then override_default_config(ARGV.shift, ARGV.shift)
+          when 'start'      then ARGV.shift; @command = :start
+          when 'stop'       then ARGV.shift; @command = :stop
+          when 'restart'    then ARGV.shift; @command = :restart
+          when 'status'     then ARGV.shift; @command = :status
+          when 'version'    then ARGV.shift; @command = :version
+          when 'foreground' then ARGV.shift; @command = :foreground
+          when '--verbose'  then ARGV.shift; Config.versbose = true
+          when /^-/         then override_default_config(ARGV.shift, ARGV.shift)
           else break
         end
       end
@@ -241,6 +242,15 @@ module Nickserver
         puts "#{@name.capitalize} couldn't be started."
         exit(1)
       end
+    end
+
+    def command_foreground(&block)
+      trap("INT") do
+        puts "\nShutting down..."
+        exit(0)
+      end
+      yield
+      exit(0)
     end
 
     def command_stop

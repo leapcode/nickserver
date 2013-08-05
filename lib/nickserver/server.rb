@@ -22,6 +22,9 @@ module Nickserver
     def self.start(opts={})
       Nickserver::Config.load
       options = {:host => '0.0.0.0', :port => Nickserver::Config.port.to_i}.merge(opts)
+      unless defined?(TESTING)
+        puts "Starting nickserver #{options[:host]}:#{options[:port]}"
+      end
       EM.start_server options[:host], options[:port], Nickserver::Server
     end
 
