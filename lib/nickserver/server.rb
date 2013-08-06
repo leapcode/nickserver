@@ -42,6 +42,8 @@ module Nickserver
       else
         send_key(uid)
       end
+    rescue RuntimeError => exc
+      send_error(exc.to_s)
     end
 
     private

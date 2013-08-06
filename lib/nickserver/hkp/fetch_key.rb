@@ -36,7 +36,7 @@ module Nickserver; module HKP
         end
       }
       http.errback {
-        self.fail 0, http.error
+        self.fail 500, http.error
       }
     end
 

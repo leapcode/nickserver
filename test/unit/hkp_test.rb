@@ -21,7 +21,7 @@ class HkpTest < MiniTest::Unit::TestCase
 
   def test_key_info_reject_keysize
     fetch_key_info :hkp_vindex_result, 'frog@leap.se' do |keys|
-      assert_equal 1, keys.length, 'should find one key'
+      assert_equal 1, keys.length, 'should find one key' # because short key gets ignored
       assert_equal '00440025', keys.first.keyid
     end
   end
@@ -66,6 +66,17 @@ class HkpTest < MiniTest::Unit::TestCase
       assert_equal 404, error
     end
   end
+
+  def test_fetch_key_too_short
+    uid    = 'chiiph@leap.se'
+    key_id = '9A753A6B'
+
+    stub_sks_vindex_reponse(uid, :body => file_content(:short_key_vindex_result))
+    test_em_errback "Nickserver::HKP::FetchKey.new.get '#{uid}'" do |error|
+      assert_equal 500, error
+    end
+  end
+
 
   protected
 

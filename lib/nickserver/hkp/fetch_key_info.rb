@@ -17,12 +17,17 @@ module Nickserver; module HKP
       params = {:op => 'vindex', :search => uid, :exact => 'on', :options => 'mr', :fingerprint => 'on'}
       EventMachine::HttpRequest.new(Config.hkp_url).get(:query => params).callback {|http|
         if http.response_header.status != 200
-          self.fail http.response_header.status, "Could net fetch keyinfo"
+          self.fail http.response_header.status, "Could net fetch keyinfo."
         else
-          self.succeed parse(uid, http.response)
+          keys, errors = parse(uid, http.response)
+          if keys.empty?
+            self.fail 500, errors.join("\n")
+          else
+            self.succeed keys
+          end
         end
       }.errback {|http|
-        self.fail 0, http.error
+        self.fail 500, http.error
       }
       self
     end
@@ -33,33 +38,36 @@ module Nickserver; module HKP
     #  vindex_result -- raw output from a vindex hkp query (machine readable)
     #
     # returns:
-    #   an array of eligible keys (as HKPKeyInfo objects) matching uid.
+    #   an array of:
+    #   [0] -- array of eligible keys (as HKPKeyInfo objects) matching uid.
+    #   [1] -- array of error messages
     #
     # keys are eliminated from eligibility for a number of reasons, including expiration,
     # revocation, uid match, key length, and so on...
     #
     def parse(uid, vindex_result)
       keys = []
+      errors = []
       now = Time.now
       vindex_result.scan(MATCH_PUB_KEY).each do |match|
         key_info = KeyInfo.new(match[0])
         if key_info.uids.include?(uid)
-          if key_info.keylen <= 1024
-            #puts 'key length is too short'
+          if key_info.keylen < 2048
+            errors << "Ignoring key #{key_info.keyid} for #{uid}: key length is too short."
           elsif key_info.expired?
-            #puts 'ignoring expired key'
+            errors << "Ignoring key #{key_info.keyid} for #{uid}: key expired."
           elsif key_info.revoked?
-            #puts 'ignoring revoked key'
+            errors << "Ignoring key #{key_info.keyid} for #{uid}: key revoked."
           elsif key_info.disabled?
-            #puts 'ignoring disabled key'
+            errors << "Ignoring key #{key_info.keyid} for #{uid}: key disabled."
           elsif key_info.expirationdate && key_info.expirationdate < now
-            #puts 'ignoring expired key'
+            errors << "Ignoring key #{key_info.keyid} for #{uid}: key expired"
           else
             keys << key_info
           end
         end
       end
-      keys
+      [keys, errors]
     end
   end
 
