@@ -46,8 +46,6 @@ class MiniTest::Unit::TestCase
   def stub_couch_response(uid, opts = {})
     # can't stub localhost, so set couch_host to anything else
     Nickserver::Config.stub :couch_host, 'notlocalhost' do
-      uid = uid.split('@').first # TEMPORARY HACK FOR NOW. in the future
-                                 # the database should be able to be searchable by full address
       options = {:status => 200, :body => ""}.merge(opts)
       query = "\?key=#{"%22#{uid}%22"}&reduce=false"
       stub_http_request(:get, /#{Regexp.escape(Nickserver::Couch::FetchKey.couch_url)}.*#{query}/).to_return(options)

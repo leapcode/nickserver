@@ -13,7 +13,7 @@ domains: ~
 #
 couch_host: 'localhost'
 couch_port: 5984
-couch_database: 'users'
+couch_database: 'identities'
 couch_user: ~
 couch_password: ~
 
