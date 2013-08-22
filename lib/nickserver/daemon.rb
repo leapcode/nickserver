@@ -166,7 +166,10 @@ module Nickserver
       if log_path = Config.log_file
         FileUtils.mkdir_p File.dirname(log_path), :mode => 0755
         FileUtils.touch log_path
-        File.chmod(0644, log_path)
+        File.chmod(0600, log_path)
+        if Config.user && Process::Sys.getuid == 0
+          FileUtils.chown(Config.user, nil, log_path)
+        end
         $stdout.reopen(log_path, 'a')
         $stderr.reopen $stdout
         $stdout.sync = true
@@ -207,7 +210,7 @@ module Nickserver
           when 'status'     then ARGV.shift; @command = :status
           when 'version'    then ARGV.shift; @command = :version
           when 'foreground' then ARGV.shift; @command = :foreground
-          when '--verbose'  then ARGV.shift; Config.versbose = true
+          when '--verbose'  then ARGV.shift; Config.verbose = true
           when /^-/         then override_default_config(ARGV.shift, ARGV.shift)
           else break
         end
