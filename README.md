@@ -67,12 +67,11 @@ Configuration
 ==================================
 
 Nickserver loads the configuration files `config/default.yml` and
-`/etc/leap/nickserver.yml`, if it exists. See `config/default.yml` for the
+`/etc/nickserver.yml`, if it exists. See `config/default.yml` for the
 available options.
 
 The default HKP host is set to https://hkps.pool.sks-keyservers.net. The CA
-for this pool is available here https://sks-keyservers.net/sks-
-keyservers.netCA.pem
+for this pool is available here https://sks-keyservers.net/sks-keyservers.netCA.pem
 
 Usage
 ==================================

@@ -4,7 +4,7 @@ module Nickserver
   class Config
     PATHS = [
       File.expand_path('../../../config/default.yml', __FILE__),
-      '/etc/leap/nickserver.yml'
+      '/etc/nickserver.yml'
     ]
 
     class << self
