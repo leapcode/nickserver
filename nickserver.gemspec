@@ -18,10 +18,10 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_development_dependency 'rake'
-  gem.add_development_dependency 'minitest'
-  gem.add_development_dependency 'webmock'
+  gem.add_development_dependency 'minitest', '~> 5.2'
+  gem.add_development_dependency 'webmock', '~> 1.17'
 
-  gem.add_dependency 'eventmachine'
-  gem.add_dependency 'em-http-request'
-  gem.add_dependency 'eventmachine_httpserver'
+  gem.add_dependency 'eventmachine', '~> 1.0'
+  gem.add_dependency 'em-http-request', '~> 1.1'
+  gem.add_dependency 'eventmachine_httpserver', '~> 0.2'
 end

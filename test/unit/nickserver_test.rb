@@ -14,7 +14,7 @@ require 'json'
 # default (localhost) to a dummy value (notlocalhost).
 #
 
-class NickserverTest < MiniTest::Unit::TestCase
+class NickserverTest < Minitest::Test
 
   def test_GET_served_via_SKS
     uid    = 'cloudadmin@leap.se'

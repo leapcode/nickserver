@@ -1,13 +1,14 @@
 $LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 
 require 'rubygems'
+require 'bundler/setup'
 require 'minitest/autorun'
 require 'webmock/minitest'
 require 'nickserver'
 
 TESTING = true
 
-class MiniTest::Unit::TestCase
+class Minitest::Test
   # Add global extensions to the test case class here
 
   def setup

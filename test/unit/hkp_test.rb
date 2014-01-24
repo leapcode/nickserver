@@ -1,6 +1,6 @@
 require File.expand_path('test_helper', File.dirname(__FILE__))
 
-class HkpTest < MiniTest::Unit::TestCase
+class HkpTest < Minitest::Test
 
   def test_key_info_expired
     fetch_key_info(:hkp_vindex_result, 'lemur@leap.se') do |keys|
@@ -95,9 +95,9 @@ class HkpTest < MiniTest::Unit::TestCase
         yield response
         return
       }
-      deferrable.errback {|response|
+      deferrable.errback {|response, msg|
         EM.stop
-        flunk "Expecting callback, but errback invoked with response: #{response}"
+        flunk "Expecting callback, but errback invoked with response: #{response} #{msg}"
       }
     end
     assert false, 'should not get here'
