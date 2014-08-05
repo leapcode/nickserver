@@ -34,16 +34,6 @@ class HkpTest < Minitest::Test
     end
   end
 
-  def test_key_info_real_network
-    real_network do
-      uid = 'elijah@riseup.net'
-      test_em_callback "Nickserver::HKP::FetchKeyInfo.new.search '#{uid}'" do |keys|
-        assert_equal 1, keys.size
-        assert keys.first.keyid =~ /00440025$/
-      end
-    end
-  end
-
   def test_fetch_key
     uid    = 'cloudadmin@leap.se'
     key_id = 'E818C478D3141282F7590D29D041EB11B1647490'
@@ -77,6 +67,39 @@ class HkpTest < Minitest::Test
     end
   end
 
+  #
+  # real network tests
+  # remember: must be run with REAL_NET=true
+  #
+
+  def test_key_info_real_network
+    real_network do
+      uid = 'elijah@riseup.net'
+      test_em_callback "Nickserver::HKP::FetchKeyInfo.new.search '#{uid}'" do |keys|
+        assert_equal 1, keys.size
+        assert keys.first.keyid =~ /00440025$/
+      end
+    end
+  end
+
+  def test_tls_validation_with_real_network
+    hkp_url = 'https://keys.mayfirst.org/pks/lookup'
+    ca_file = file_path('mayfirst-ca.pem')
+
+    real_network do
+      stub_config(:hkp_url, hkp_url) do
+        stub_config(:hkp_ca_file, ca_file) do
+        #stub_config(:hkp_ca_file, file_path('autistici-ca.pem')) do
+          assert File.exists?(Nickserver::Config.hkp_ca_file)
+          uid = 'elijah@riseup.net'
+          test_em_callback "Nickserver::HKP::FetchKeyInfo.new.search '#{uid}'" do |keys|
+            assert_equal 1, keys.size
+            assert keys.first.keyid =~ /00440025$/
+          end
+        end
+      end
+    end
+  end
 
   protected
 
@@ -97,7 +120,8 @@ class HkpTest < Minitest::Test
       }
       deferrable.errback {|response, msg|
         EM.stop
-        flunk "Expecting callback, but errback invoked with response: #{response} #{msg}"
+        puts caller.join("\n")
+        flunk "Expecting callback, but errback invoked with response: #{response} #{msg}\n\n#{caller.join("\n")}"
       }
     end
     assert false, 'should not get here'

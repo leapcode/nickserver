@@ -9,6 +9,7 @@ module Nickserver
 
     class << self
       attr_accessor :hkp_url
+      attr_accessor :hkp_ca_file
       attr_accessor :couch_port
       attr_accessor :couch_host
       attr_accessor :couch_database
@@ -32,9 +33,26 @@ module Nickserver
         end
         true
       end
+      self.validate
     end
 
     private
+
+    def self.validate
+      if @hkp_ca_file
+        # look for the hkp_ca_file either by absolute path or relative to nickserver gem root
+        [@hkp_ca_file, File.expand_path(@hkp_ca_file, "#{__FILE__}/../../../")].each do |file|
+          if File.exists?(file)
+            @hkp_ca_file = file
+            break
+          end
+        end
+        unless File.exists?(@hkp_ca_file)
+          STDERR.puts "ERROR in configuration: cannot find hkp_ca_file `#{@hkp_ca_file}`"
+          exit(1)
+        end
+      end
+    end
 
     def self.load_config(file_path)
       begin

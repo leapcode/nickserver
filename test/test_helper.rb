@@ -19,7 +19,11 @@ class Minitest::Test
   end
 
   def file_content(filename)
-    (@file_contents ||= {})[filename] ||= File.read("%s/files/%s" % [File.dirname(__FILE__), filename])
+    (@file_contents ||= {})[filename] ||= File.read(file_path(filename))
+  end
+
+  def file_path(filename)
+    "%s/files/%s" % [File.dirname(__FILE__), filename]
   end
 
   def real_network
@@ -52,6 +56,13 @@ class Minitest::Test
       stub_http_request(:get, /#{Regexp.escape(Nickserver::Couch::FetchKey.couch_url)}.*#{query}/).to_return(options)
       yield
     end
+  end
+
+  #
+  # temporarily stubs the config property for the duration of the given block
+  #
+  def stub_config(property, value, &block)
+    Nickserver::Config.stub(property, value, &block)
   end
 
 end
