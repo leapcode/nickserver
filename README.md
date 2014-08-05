@@ -87,3 +87,14 @@ Usage
 
     where OPTION is one of:
       --verbose     log more
+
+Running Tests
+==================================
+
+To run the test suite, run:
+
+    rake
+
+The tests that actually make real network calls are disabled by default. To run these tests to, do this:
+
+    REAL_NET=true rake
