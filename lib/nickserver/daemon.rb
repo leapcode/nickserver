@@ -65,7 +65,7 @@ module Nickserver
         Process.setsid
         exit if fork
         create_pid_file(Config.pid_file, Config.user)
-        catch_interrupt
+        catch_signals
         redirect_output
         drop_permissions_to(Config.user) if Config.user
         File.umask 0000
@@ -126,17 +126,19 @@ module Nickserver
     end
 
     #
-    # Gracefully handle Ctrl-C
+    # stop when we should
     #
-    def catch_interrupt
-      Signal.trap("SIGINT") do
+    def catch_signals
+      sigtrap = proc {
         command_stop
         $stdout.puts "\nQuit"
         $stdout.flush
         exit
+      }
+      ["SIGTERM", "SIGINT", "SIGHUP"].each do |signal|
+        Signal.trap(signal, sigtrap)
       end
     end
-
 
     #
     # OUTPUT
