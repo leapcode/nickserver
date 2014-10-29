@@ -17,11 +17,11 @@ module Nickserver
     # Available options:
     #
     #   * :port (default Nickserver::Config.port)
-    #   * :host (default 0.0.0.0)
+    #   * :host (default 127.0.0.1)
     #
     def self.start(opts={})
       Nickserver::Config.load
-      options = {:host => '0.0.0.0', :port => Nickserver::Config.port.to_i}.merge(opts)
+      options = {:host => '127.0.0.1', :port => Nickserver::Config.port.to_i}.merge(opts)
       unless defined?(TESTING)
         puts "Starting nickserver #{options[:host]}:#{options[:port]}"
       end
