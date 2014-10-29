@@ -113,11 +113,7 @@ module Nickserver
         else
           bail "Error reading pid file #{file}"
         end
-        begin
-          FileUtils.rm Config.pid_file
-        rescue Errno::EACCES
-          bail 'insufficient permission to remove pid file'
-        end
+        remove_pid_file
       else
         bail "could not find pid file #{file}"
       end
@@ -125,18 +121,20 @@ module Nickserver
       puts "Failed to stop: #{e}"
     end
 
+    def remove_pid_file
+      FileUtils.rm Config.pid_file
+    rescue Errno::EACCES
+      bail 'insufficient permission to remove pid file'
+    end
+
     #
     # stop when we should
     #
     def catch_signals
-      sigtrap = proc {
-        command_stop
-        $stdout.puts "\nQuit"
-        $stdout.flush
-        exit
-      }
       ["SIGTERM", "SIGINT", "SIGHUP"].each do |signal|
-        Signal.trap(signal, sigtrap)
+        Signal.trap(signal) {
+          exit
+        }
       end
     end
 
