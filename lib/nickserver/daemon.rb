@@ -267,6 +267,7 @@ module Nickserver
 
     def command_restart(&block)
       command_stop
+      sleep(0.5)
       command_start(&block)
     end
 
