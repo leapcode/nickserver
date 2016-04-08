@@ -43,6 +43,8 @@ module Nickserver
         send_key(uid)
       end
     rescue RuntimeError => exc
+      puts "Error: #{exc}"
+      puts exc.backtrace
       send_error(exc.to_s)
     end
 
