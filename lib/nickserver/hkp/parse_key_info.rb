@@ -1,3 +1,10 @@
+#
+# Simple parser for HKP KeyInfo responses.
+#
+# Focus is on simple here. Trying to avoid state and sideeffects.
+# Parsing a response with 12 keys and validating them takes 2ms.
+# So no need for memoization and making things more complex.
+#
 module Nickserver; module HKP
   class ParseKeyInfo
 
@@ -13,10 +20,10 @@ module Nickserver; module HKP
     end
 
     def status(uid)
-      if header.status == 200 && keys(uid).any?
-        200
-      else
+      if hkp_ok? && keys(uid).empty?
         error_status(uid)
+      else
+        header.status
       end
     end
 
@@ -38,14 +45,10 @@ module Nickserver; module HKP
     attr_reader :vindex_result
 
     def error_status(uid)
-      if header.status != 200
-        header.status
+      if errors(uid).any?
+        500
       else
-        if errors(uid).any?
-          500
-        else
-          404
-        end
+        404
       end
     end
 
@@ -67,9 +70,15 @@ module Nickserver; module HKP
     end
 
     def all_key_infos
+      # only parse hkp responses with status 200 (OK)
+      return [] unless hkp_ok?
       @all_key_infos ||= vindex_result.scan(MATCH_PUB_KEY).map do |match|
         KeyInfo.new(match[0])
       end
+    end
+
+    def hkp_ok?
+      header.status == 200
     end
 
     def error_message(uid, key, err)
