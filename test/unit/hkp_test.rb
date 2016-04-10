@@ -34,6 +34,14 @@ class HkpTest < Minitest::Test
     end
   end
 
+  def test_no_matching_key_found
+    uid = 'leaping_lemur@leap.se'
+    stub_sks_vindex_reponse(uid, :status => 200)
+    test_em_errback "Nickserver::HKP::FetchKeyInfo.new.search '#{uid}'" do |error|
+      assert_equal 404, error
+    end
+  end
+
   def test_fetch_key
     uid    = 'cloudadmin@leap.se'
     key_id = 'E818C478D3141282F7590D29D041EB11B1647490'
