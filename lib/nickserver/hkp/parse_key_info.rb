@@ -1,0 +1,93 @@
+module Nickserver; module HKP
+  class ParseKeyInfo
+
+    # for this regexp to work, the source text must end in a trailing "\n",
+    # which the output of sks does.
+    MATCH_PUB_KEY = /(^pub:.+?\n(^uid:.+?\n)+)/m
+
+    #  header        -- header of the hkp response
+    #  vindex_result -- raw output from a vindex hkp query (machine readable)
+    def initialize(header, vindex_result)
+      @header = header
+      @vindex_result = vindex_result
+    end
+
+    def status(uid)
+      if header.status == 200 && keys(uid).any?
+        200
+      else
+        error_status(uid)
+      end
+    end
+
+    def keys(uid)
+      key_infos(uid).reject { |key| error_for_key(key) }
+    end
+
+    def msg(uid)
+      if errors(uid).any?
+        error_messages(uid).join "\n"
+      else
+        "Could not fetch keyinfo."
+      end
+    end
+
+    protected
+
+    attr_reader :header
+    attr_reader :vindex_result
+
+    def error_status(uid)
+      if header.status != 200
+        header.status
+      else
+        if errors(uid).any?
+          500
+        else
+          404
+        end
+      end
+    end
+
+    def errors(uid)
+      key_infos(uid).map{|key| error_for_key(key) }.compact
+    end
+
+    def error_messages(uid)
+      key_infos(uid).map do |key|
+        err = error_for_key(key)
+        error_message(uid, key, err)
+      end.compact
+    end
+
+    def key_infos(uid)
+      all_key_infos.select do |key_info|
+        key_info.uids.include?(uid)
+      end
+    end
+
+    def all_key_infos
+      @all_key_infos ||= vindex_result.scan(MATCH_PUB_KEY).map do |match|
+        KeyInfo.new(match[0])
+      end
+    end
+
+    def error_message(uid, key, err)
+      "Ignoring key #{key.keyid} for #{uid}: #{err}" if err
+    end
+
+    def error_for_key(key)
+      if key.keylen < 2048
+        "key length is too short."
+      elsif key.expired?
+        "key expired."
+      elsif key.revoked?
+        "key revoked."
+      elsif key.disabled?
+        "key disabled."
+      elsif key.expirationdate && key.expirationdate < Time.now
+        "key expired"
+      end
+    end
+  end
+end; end
