@@ -9,6 +9,7 @@ silence_warnings do
 end
 require 'nickserver'
 require 'minitest/pride'
+require 'minitest/hell'
 
 TESTING = true
 
