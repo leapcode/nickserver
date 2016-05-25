@@ -1,4 +1,5 @@
 require 'cgi'
+require 'nickserver/hkp'
 
 #
 # Class to represent the key information result from a query to a key server
@@ -9,9 +10,9 @@ require 'cgi'
 # format definition of machine readable index output is here:
 # http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00#section-5.2
 #
-module Nickserver; module Hkp
+module Nickserver::Hkp
   class KeyInfo
-    attr_accessor :uids, :keyid, :algo, :keylen, :creationdate, :expirationdate, :flags
+    attr_accessor :uids, :keyid, :algo, :flags
 
     def initialize(hkp_record)
       uid_lines = hkp_record.split("\n")
@@ -19,7 +20,7 @@ module Nickserver; module Hkp
       @keyid, @algo, @keylen_s, @creationdate_s, @expirationdate_s, @flags = pub_line.split(':')[1..-1]
       @uids = []
       uid_lines.each do |uid_line|
-        uid, creationdate, expirationdate, flags = uid_line.split(':')[1..-1]
+        uid, _creationdate, _expirationdate, _flags = uid_line.split(':')[1..-1]
         # for now, ignore the expirationdate and flags of uids. sks does return them anyway
         @uids << CGI.unescape(uid.sub(/.*<(.+)>.*/, '\1'))
       end
@@ -66,4 +67,4 @@ module Nickserver; module Hkp
     end
   end
 
-end; end
+end
