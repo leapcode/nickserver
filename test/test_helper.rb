@@ -28,7 +28,7 @@ class Minitest::Test
   end
 
   def real_network
-    if ENV['REAL_NET'] == 'true'
+    unless ENV['ONLY_LOCAL'] == 'true'
       WebMock.allow_net_connect!
       yield
       WebMock.disable_net_connect!
