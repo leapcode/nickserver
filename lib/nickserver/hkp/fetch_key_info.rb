@@ -10,8 +10,8 @@ module Nickserver; module HKP
 
     def search(uid)
       # in practice, exact=on seems to have no effect
-      params = {:op => 'vindex', :search => uid, :exact => 'on', :options => 'mr', :fingerprint => 'on'}
-      EventMachine::HttpRequest.new(Config.hkp_url).get(:query => params).callback {|http|
+      params = {op: 'vindex', search: uid, exact: 'on', options: 'mr', fingerprint: 'on'}
+      EventMachine::HttpRequest.new(Config.hkp_url).get(query: params).callback {|http|
         parser = ParseKeyInfo.new http.response_header, http.response
         keys = parser.keys(uid)
         if keys.any?

@@ -24,7 +24,7 @@ module Nickserver; module Couch
     #
     def couch_request(uid)
       query = {"reduce" => "false", "key" => "\"#{uid}\""}
-      request = EventMachine::HttpRequest.new(FetchKey.couch_url).get(:timeout => @timeout, :query => query)
+      request = EventMachine::HttpRequest.new(FetchKey.couch_url).get(timeout: @timeout, query: query)
       request.callback {|http|
         if http.response_header.status != 200
           self.fail http.response_header.status, 'Unknown Error'

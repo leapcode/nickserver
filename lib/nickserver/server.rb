@@ -21,7 +21,7 @@ module Nickserver
     #
     def self.start(opts={})
       Nickserver::Config.load
-      options = {:host => '127.0.0.1', :port => Nickserver::Config.port.to_i}.merge(opts)
+      options = {host: '127.0.0.1', port: Nickserver::Config.port.to_i}.merge(opts)
       unless defined?(TESTING)
         puts "Starting nickserver #{options[:host]}:#{options[:port]}"
       end
@@ -51,15 +51,15 @@ module Nickserver
     private
 
     def send_error(msg = "not supported")
-      send_response(:status => 500, :content => "500 #{msg}\n")
+      send_response(status: 500, content: "500 #{msg}\n")
     end
 
     def send_not_found(msg = "Not Found")
-      send_response(:status => 404, :content => "404 #{msg}\n")
+      send_response(status: 404, content: "404 #{msg}\n")
     end
 
     def send_response(opts = {})
-      options = {:status => 200, :content_type => 'text/plain', :content => ''}.merge(opts)
+      options = {status: 200, content_type: 'text/plain', content: ''}.merge(opts)
       response = EM::DelegatedHttpResponse.new(self)
       response.status = options[:status]
       response.content_type options[:content_type]
@@ -69,7 +69,7 @@ module Nickserver
 
     def send_key(uid)
       get_key_from_uid(uid) do |key|
-        send_response :content => format_response(:address => uid, :openpgp => key)
+        send_response content: format_response(address: uid, openpgp: key)
       end
     end
 
@@ -98,7 +98,7 @@ module Nickserver
         if status == 404
           send_not_found
         else
-          send_response(:status => status, :content => msg)
+          send_response(status: status, content: msg)
         end
       }
     end

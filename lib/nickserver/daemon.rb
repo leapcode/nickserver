@@ -164,7 +164,7 @@ module Nickserver
     #
     def redirect_output
       if log_path = Config.log_file
-        FileUtils.mkdir_p File.dirname(log_path), :mode => 0755
+        FileUtils.mkdir_p File.dirname(log_path), mode: 0755
         FileUtils.touch log_path
         File.chmod(0600, log_path)
         if Config.user && Process::Sys.getuid == 0

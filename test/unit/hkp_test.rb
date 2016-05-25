@@ -28,7 +28,7 @@ class HkpTest < Minitest::Test
 
   def test_key_info_not_found
     uid = 'leaping_lemur@leap.se'
-    stub_sks_vindex_reponse(uid, :status => 404)
+    stub_sks_vindex_reponse(uid, status: 404)
     test_em_errback "Nickserver::HKP::FetchKeyInfo.new.search '#{uid}'" do |error|
       assert_equal 404, error
     end
@@ -36,7 +36,7 @@ class HkpTest < Minitest::Test
 
   def test_no_matching_key_found
     uid = 'leaping_lemur@leap.se'
-    stub_sks_vindex_reponse(uid, :status => 200)
+    stub_sks_vindex_reponse(uid, status: 200)
     test_em_errback "Nickserver::HKP::FetchKeyInfo.new.search '#{uid}'" do |error|
       assert_equal 404, error
     end
@@ -45,8 +45,8 @@ class HkpTest < Minitest::Test
   def test_fetch_key
     uid    = 'cloudadmin@leap.se'
     key_id = 'E818C478D3141282F7590D29D041EB11B1647490'
-    stub_sks_vindex_reponse(uid, :body => file_content(:leap_vindex_result))
-    stub_sks_get_reponse(key_id, :body => file_content(:leap_public_key))
+    stub_sks_vindex_reponse(uid, body: file_content(:leap_vindex_result))
+    stub_sks_get_reponse(key_id, body: file_content(:leap_public_key))
 
     test_em_callback "Nickserver::HKP::FetchKey.new.get '#{uid}'" do |key_text|
       assert_equal file_content(:leap_public_key), key_text
@@ -57,8 +57,8 @@ class HkpTest < Minitest::Test
     uid    = 'cloudadmin@leap.se'
     key_id = 'E818C478D3141282F7590D29D041EB11B1647490'
 
-    stub_sks_vindex_reponse(uid, :body => file_content(:leap_vindex_result))
-    stub_sks_get_reponse(key_id, :status => 404)
+    stub_sks_vindex_reponse(uid, body: file_content(:leap_vindex_result))
+    stub_sks_get_reponse(key_id, status: 404)
 
     test_em_errback "Nickserver::HKP::FetchKey.new.get '#{uid}'" do |error|
       assert_equal 404, error
@@ -69,7 +69,7 @@ class HkpTest < Minitest::Test
     uid    = 'chiiph@leap.se'
     key_id = '9A753A6B'
 
-    stub_sks_vindex_reponse(uid, :body => file_content(:short_key_vindex_result))
+    stub_sks_vindex_reponse(uid, body: file_content(:short_key_vindex_result))
     test_em_errback "Nickserver::HKP::FetchKey.new.get '#{uid}'" do |error|
       assert_equal 500, error
     end
@@ -156,7 +156,7 @@ class HkpTest < Minitest::Test
   end
 
   def fetch_key_info(body_source, uid, &block)
-    stub_sks_vindex_reponse(uid, :body => file_content(body_source))
+    stub_sks_vindex_reponse(uid, body: file_content(body_source))
     test_em_callback "Nickserver::HKP::FetchKeyInfo.new.search '#{uid}'", &block
   end
 
