@@ -1,9 +1,12 @@
 $LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 
 require 'rubygems'
+require 'kernel_ext'
 require 'bundler/setup'
 require 'minitest/autorun'
-require 'webmock/minitest'
+silence_warnings do
+  require 'webmock/minitest'
+end
 require 'nickserver'
 require 'minitest/pride'
 

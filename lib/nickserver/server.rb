@@ -1,6 +1,8 @@
 require 'kernel_ext'
 require 'eventmachine'
-require 'evma_httpserver'
+silence_warnings do
+  require 'evma_httpserver'
+end
 require 'json'
 
 #
