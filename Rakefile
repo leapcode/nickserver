@@ -26,7 +26,7 @@ $spec      = eval(File.read(File.join($base_dir, $spec_path)))
 $gem_path  = File.join($base_dir, 'pkg', "#{$spec.name}-#{$spec.version}.gem")
 
 def run(cmd)
-  PTY.spawn(cmd) do |output, input, pid|
+  PTY.spawn(cmd) do |output, _input, _pid|
     begin
       while line = output.gets do
         puts line

@@ -45,13 +45,6 @@ Lint/RescueException:
     - 'lib/nickserver/config.rb'
     - 'lib/nickserver/couch/fetch_key.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: AllowUnusedKeywordArguments.
-Lint/UnusedBlockArgument:
-  Exclude:
-    - 'Rakefile'
-
 # Offense count: 5
 # Cop supports --auto-correct.
 # Configuration parameters: AllowUnusedKeywordArguments, IgnoreEmptyMethods.
