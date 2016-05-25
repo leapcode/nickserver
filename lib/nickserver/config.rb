@@ -59,7 +59,7 @@ module Nickserver
         YAML.load(File.read(file_path)).each do |key, value|
           begin
             self.send("#{key}=", value)
-          rescue NoMethodError => exc
+          rescue NoMethodError
             STDERR.puts "ERROR in file #{file_path}, '#{key}' is not a valid option"
             exit(1)
           end

@@ -60,7 +60,7 @@ module Nickserver
 
     def daemonize
       return bail("Process is already started") if daemon_running?
-      pid = fork do
+      _pid = fork do
         exit if fork
         Process.setsid
         exit if fork
@@ -219,7 +219,7 @@ module Nickserver
     end
 
     def override_default_config(flag, value)
-      flag = flag.sub /^--/, ''
+      flag = flag.sub(/^--/, '')
       if Config.respond_to?("#{flag}=")
         Config.send("#{flag}=", value)
       else

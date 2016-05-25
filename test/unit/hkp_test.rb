@@ -67,7 +67,6 @@ class HkpTest < Minitest::Test
 
   def test_fetch_key_too_short
     uid    = 'chiiph@leap.se'
-    key_id = '9A753A6B'
 
     stub_sks_vindex_reponse(uid, body: file_content(:short_key_vindex_result))
     test_em_errback "Nickserver::Hkp::FetchKey.new.get '#{uid}'" do |error|
