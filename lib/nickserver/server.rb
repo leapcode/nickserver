@@ -1,3 +1,4 @@
+require 'kernel_ext'
 require 'eventmachine'
 require 'evma_httpserver'
 require 'json'
@@ -64,7 +65,9 @@ module Nickserver
       response.status = options[:status]
       response.content_type options[:content_type]
       response.content = options[:content]
-      response.send_response
+      silence_warnings do
+        response.send_response
+      end
     end
 
     def send_key(uid)
