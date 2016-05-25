@@ -18,13 +18,6 @@ Lint/AssignmentInCondition:
     - 'Rakefile'
     - 'lib/nickserver/daemon.rb'
 
-# Offense count: 11
-# Cop supports --auto-correct.
-# Configuration parameters: AlignWith, SupportedStyles, AutoCorrect.
-# SupportedStyles: keyword, variable, start_of_line
-Lint/EndAlignment:
-  Enabled: false
-
 # Offense count: 1
 Lint/Eval:
   Exclude:

@@ -8,3 +8,7 @@ Style/HashSyntax:
 
 Lint/DeprecatedClassMethods:
   Enabled: true
+
+# complains about our nested module end; end style
+Lint/EndAlignment:
+  Enabled: false
