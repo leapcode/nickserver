@@ -15,7 +15,7 @@ For more information, see https://leap.se/nicknym
 
 About nickserver:
 
-* Written in Ruby 1.9, licensed GPLv3
+* Written in Ruby 2.1, licensed GPLv3
 * Lightweight and scalable (high concurrency, reasonable latency)
 * Uses asynchronous network IO for both server and client connections (via EventMachine)
 
@@ -34,7 +34,7 @@ For more details, see https://leap.se/nicknym
 Requirements
 ==================================
 
-* Ruby 1.9
+* Ruby (tested with 2.1.5)
 * CouchDB
 
 Installation
@@ -44,7 +44,7 @@ You have three fine options for installing nickserver:
 
 Install prerequisites
 
-    $ sudo apt-get install ruby1.9.1-dev libssl-dev
+    $ sudo apt-get install ruby-dev libssl-dev
 
 Note: libssl-dev must be installed before installing the gem EventMachine,
 otherwise the gem will get built without TLS support.
