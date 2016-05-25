@@ -5,7 +5,7 @@ require 'em-http'
 # http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00
 #
 
-module Nickserver; module HKP
+module Nickserver; module Hkp
 
   class FetchKey
     include EM::Deferrable

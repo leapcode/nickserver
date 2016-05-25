@@ -90,7 +90,7 @@ module Nickserver
       fetcher = if local_address?(uid)
         Nickserver::Couch::FetchKey.new
       else
-        Nickserver::HKP::FetchKey.new
+        Nickserver::Hkp::FetchKey.new
       end
       fetcher.get(uid).callback {|key|
         yield key

@@ -1,39 +1,40 @@
+require 'nickserver/hkp'
+require 'nickserver/hkp/key_info'
+
 #
 # Simple parser for Hkp KeyInfo responses.
 #
 # Focus is on simple here. Trying to avoid state and sideeffects.
 # Parsing a response with 12 keys and validating them takes 2ms.
 # So no need for memoization and making things more complex.
-#
-module Nickserver; module Hkp
-  class ParseKeyInfo
+module Nickserver::Hkp
+  class VIndexResponse
 
     # for this regexp to work, the source text must end in a trailing "\n",
     # which the output of sks does.
     MATCH_PUB_KEY = /(^pub:.+?\n(^uid:.+?\n)+)/m
 
-    #  header        -- header of the hkp response
-    #  vindex_result -- raw output from a vindex hkp query (machine readable)
-    def initialize(header, vindex_result)
-      @header = header
-      @vindex_result = vindex_result
+    #  hkp_response -- raw output from a vindex hkp query (machine readable)
+    def initialize(nick, hkp_response)
+      @nick = nick.to_s
+      @vindex_result = hkp_response[:body]
     end
 
-    def status(uid)
-      if hkp_ok? && keys(uid).empty?
-        error_status(uid)
+    def status
+      if keys.empty?
+        error_status
       else
-        header.status
+        200
       end
     end
 
-    def keys(uid)
-      key_infos(uid).reject { |key| error_for_key(key) }
+    def keys
+      key_infos.reject { |key| error_for_key(key) }
     end
 
-    def msg(uid)
-      if errors(uid).any?
-        error_messages(uid).join "\n"
+    def msg
+      if errors.any?
+        error_messages.join "\n"
       else
         "Could not fetch keyinfo."
       end
@@ -41,48 +42,41 @@ module Nickserver; module Hkp
 
     protected
 
-    attr_reader :header
-    attr_reader :vindex_result
+    attr_reader :vindex_result, :nick
 
-    def error_status(uid)
-      if errors(uid).any?
+    def error_status
+      if errors.any?
         500
       else
         404
       end
     end
 
-    def errors(uid)
-      key_infos(uid).map{|key| error_for_key(key) }.compact
+    def errors
+      key_infos.map{|key| error_for_key(key) }.compact
     end
 
-    def error_messages(uid)
-      key_infos(uid).map do |key|
+    def error_messages
+      key_infos.map do |key|
         err = error_for_key(key)
-        error_message(uid, key, err)
+        error_message(key, err)
       end.compact
     end
 
-    def key_infos(uid)
+    def key_infos
       all_key_infos.select do |key_info|
-        key_info.uids.include?(uid)
+        key_info.uids.include?(nick)
       end
     end
 
     def all_key_infos
-      # only parse hkp responses with status 200 (OK)
-      return [] unless hkp_ok?
       @all_key_infos ||= vindex_result.scan(MATCH_PUB_KEY).map do |match|
         KeyInfo.new(match[0])
       end
     end
 
-    def hkp_ok?
-      header.status == 200
-    end
-
-    def error_message(uid, key, err)
-      "Ignoring key #{key.keyid} for #{uid}: #{err}" if err
+    def error_message(key, err)
+      "Ignoring key #{key.keyid} for #{nick}: #{err}" if err
     end
 
     def error_for_key(key)
@@ -99,4 +93,4 @@ module Nickserver; module Hkp
       end
     end
   end
-end; end
+end

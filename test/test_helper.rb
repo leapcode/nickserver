@@ -5,6 +5,7 @@ require 'bundler/setup'
 require 'minitest/autorun'
 require 'webmock/minitest'
 require 'nickserver'
+require 'minitest/pride'
 
 TESTING = true
 

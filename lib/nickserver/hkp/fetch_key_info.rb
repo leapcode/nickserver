@@ -4,7 +4,7 @@ require 'em-http'
 # used to fetch an array of KeyInfo objects that match the given uid.
 #
 
-module Nickserver; module HKP
+module Nickserver; module Hkp
   class FetchKeyInfo
     include EM::Deferrable
 

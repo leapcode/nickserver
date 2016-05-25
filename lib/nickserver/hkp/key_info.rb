@@ -9,7 +9,7 @@ require 'cgi'
 # format definition of machine readable index output is here:
 # http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00#section-5.2
 #
-module Nickserver; module HKP
+module Nickserver; module Hkp
   class KeyInfo
     attr_accessor :uids, :keyid, :algo, :keylen, :creationdate, :expirationdate, :flags
 

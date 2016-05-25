@@ -29,7 +29,7 @@ class HkpTest < Minitest::Test
   def test_key_info_not_found
     uid = 'leaping_lemur@leap.se'
     stub_sks_vindex_reponse(uid, status: 404)
-    test_em_errback "Nickserver::HKP::FetchKeyInfo.new.search '#{uid}'" do |error|
+    test_em_errback "Nickserver::Hkp::FetchKeyInfo.new.search '#{uid}'" do |error|
       assert_equal 404, error
     end
   end
@@ -37,7 +37,7 @@ class HkpTest < Minitest::Test
   def test_no_matching_key_found
     uid = 'leaping_lemur@leap.se'
     stub_sks_vindex_reponse(uid, status: 200)
-    test_em_errback "Nickserver::HKP::FetchKeyInfo.new.search '#{uid}'" do |error|
+    test_em_errback "Nickserver::Hkp::FetchKeyInfo.new.search '#{uid}'" do |error|
       assert_equal 404, error
     end
   end
@@ -48,7 +48,7 @@ class HkpTest < Minitest::Test
     stub_sks_vindex_reponse(uid, body: file_content(:leap_vindex_result))
     stub_sks_get_reponse(key_id, body: file_content(:leap_public_key))
 
-    test_em_callback "Nickserver::HKP::FetchKey.new.get '#{uid}'" do |key_text|
+    test_em_callback "Nickserver::Hkp::FetchKey.new.get '#{uid}'" do |key_text|
       assert_equal file_content(:leap_public_key), key_text
     end
   end
@@ -60,7 +60,7 @@ class HkpTest < Minitest::Test
     stub_sks_vindex_reponse(uid, body: file_content(:leap_vindex_result))
     stub_sks_get_reponse(key_id, status: 404)
 
-    test_em_errback "Nickserver::HKP::FetchKey.new.get '#{uid}'" do |error|
+    test_em_errback "Nickserver::Hkp::FetchKey.new.get '#{uid}'" do |error|
       assert_equal 404, error
     end
   end
@@ -70,7 +70,7 @@ class HkpTest < Minitest::Test
     key_id = '9A753A6B'
 
     stub_sks_vindex_reponse(uid, body: file_content(:short_key_vindex_result))
-    test_em_errback "Nickserver::HKP::FetchKey.new.get '#{uid}'" do |error|
+    test_em_errback "Nickserver::Hkp::FetchKey.new.get '#{uid}'" do |error|
       assert_equal 500, error
     end
   end
@@ -83,7 +83,7 @@ class HkpTest < Minitest::Test
   def test_key_info_real_network
     real_network do
       uid = 'elijah@riseup.net'
-      test_em_callback "Nickserver::HKP::FetchKeyInfo.new.search '#{uid}'" do |keys|
+      test_em_callback "Nickserver::Hkp::FetchKeyInfo.new.search '#{uid}'" do |keys|
         assert_equal 1, keys.size
         assert keys.first.keyid =~ /00440025$/
       end
@@ -100,7 +100,7 @@ class HkpTest < Minitest::Test
         #stub_config(:hkp_ca_file, file_path('autistici-ca.pem')) do
           assert File.exist?(Nickserver::Config.hkp_ca_file)
           uid = 'elijah@riseup.net'
-          test_em_callback "Nickserver::HKP::FetchKeyInfo.new.search '#{uid}'" do |keys|
+          test_em_callback "Nickserver::Hkp::FetchKeyInfo.new.search '#{uid}'" do |keys|
             assert_equal 1, keys.size
             assert keys.first.keyid =~ /00440025$/
           end
@@ -157,7 +157,7 @@ class HkpTest < Minitest::Test
 
   def fetch_key_info(body_source, uid, &block)
     stub_sks_vindex_reponse(uid, body: file_content(body_source))
-    test_em_callback "Nickserver::HKP::FetchKeyInfo.new.search '#{uid}'", &block
+    test_em_callback "Nickserver::Hkp::FetchKeyInfo.new.search '#{uid}'", &block
   end
 
 end
