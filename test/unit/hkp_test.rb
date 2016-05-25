@@ -98,7 +98,7 @@ class HkpTest < Minitest::Test
       stub_config(:hkp_url, hkp_url) do
         stub_config(:hkp_ca_file, ca_file) do
         #stub_config(:hkp_ca_file, file_path('autistici-ca.pem')) do
-          assert File.exists?(Nickserver::Config.hkp_ca_file)
+          assert File.exist?(Nickserver::Config.hkp_ca_file)
           uid = 'elijah@riseup.net'
           test_em_callback "Nickserver::HKP::FetchKeyInfo.new.search '#{uid}'" do |keys|
             assert_equal 1, keys.size

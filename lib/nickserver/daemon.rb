@@ -105,7 +105,7 @@ module Nickserver
 
     def kill_pid
       file = Config.pid_file
-      if File.exists?(file)
+      if File.exist?(file)
         pid = pid_from_file(file)
         if pid
           Process.kill('TERM', pid)
