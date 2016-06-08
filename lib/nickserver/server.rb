@@ -92,20 +92,23 @@ module Nickserver
     end
 
     def get_key_from_uid(uid)
-      fetcher = if local_address?(uid)
-        Nickserver::Couch::FetchKey.new
-      else
-        Nickserver::Hkp::FetchKey.new
-      end
-      fetcher.get(uid).callback {|key|
-        yield key
-      }.errback {|status, msg|
-        if status == 404
-          send_not_found
-        else
-          send_response(status: status, content: msg)
+      if local_address?(uid)
+        @fetcher = Nickserver::Couch::FetchKey.new
+        @fetcher.get(uid) do |response|
+          send_response(status: response.status, content: response.content)
         end
-      }
+      else
+        @fetcher = Nickserver::Hkp::FetchKey.new
+        @fetcher.get(uid).callback {|key|
+          yield key
+        }.errback {|status, msg|
+          if status == 404
+            send_not_found
+          else
+            send_response(status: status, content: msg)
+          end
+        }
+      end
     end
 
     def format_response(map)

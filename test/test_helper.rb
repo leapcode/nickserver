@@ -58,7 +58,7 @@ class Minitest::Test
     Nickserver::Config.stub :couch_host, 'notlocalhost' do
       options = {status: 200, body: ""}.merge(opts)
       query = "\?key=#{"%22#{uid}%22"}&reduce=false"
-      stub_http_request(:get, /#{Regexp.escape(Nickserver::Couch::FetchKey.couch_url)}.*#{query}/).to_return(options)
+      stub_http_request(:get, /#{Regexp.escape(Nickserver::Config.couch_url)}.*#{query}/).to_return(options)
       yield
     end
   end

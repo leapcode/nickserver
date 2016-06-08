@@ -2,6 +2,7 @@
 # This class allows querying couch for public keys.
 #
 require 'nickserver/couch_db/response'
+require 'nickserver/config'
 
 module Nickserver::CouchDB
   class Source
@@ -13,12 +14,16 @@ module Nickserver::CouchDB
     end
 
     def query(nick)
-      adapter.get VIEW, query: query_for(nick) do |status, body|
-        yield Response.new nick, status: status, body: body
+      adapter.get url, query: query_for(nick) do |status, body|
+        yield Response.new(nick, status: status, body: body)
       end
     end
 
     protected
+
+    def url
+      Nickserver::Config.couch_url + VIEW
+    end
 
     def query_for(nick)
       { reduce: "false", key: "\"#{nick}\"" }

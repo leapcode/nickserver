@@ -36,6 +36,21 @@ module Nickserver
       self.validate
     end
 
+    def self.couch_url
+      [ 'http://',
+        couch_auth,
+        couch_host,
+        ':',
+        couch_port,
+        '/',
+        couch_database
+      ].join
+    end
+
+    def self.couch_auth
+      "#{couch_user}:#{couch_password}@" if couch_user
+    end
+
     private
 
     def self.validate
