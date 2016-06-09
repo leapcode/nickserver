@@ -4,6 +4,9 @@ silence_warnings do
   require 'evma_httpserver'
 end
 require 'json'
+require 'nickserver/couch_db/source'
+require 'nickserver/adapters/em_http'
+
 
 #
 # This is the main HTTP server that clients connect to in order to fetch keys
@@ -93,8 +96,8 @@ module Nickserver
 
     def get_key_from_uid(uid)
       if local_address?(uid)
-        @fetcher = Nickserver::Couch::FetchKey.new
-        @fetcher.get(uid) do |response|
+        @source = Nickserver::CouchDB::Source.new(adapter)
+        @source.query(uid) do |response|
           send_response(status: response.status, content: response.content)
         end
       else
@@ -135,8 +138,13 @@ module Nickserver
           return uid_domain == host
         end
       end
-    rescue
+    rescue # XXX what are we rescueing here?
       return false
     end
+
+    def adapter
+      @adapter ||= Nickserver::Adapters::EmHttp.new
+    end
+
   end
 end
