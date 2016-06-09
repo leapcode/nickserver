@@ -5,6 +5,7 @@ silence_warnings do
 end
 require 'json'
 require 'nickserver/couch_db/source'
+require 'nickserver/hkp/response'
 require 'nickserver/adapters/em_http'
 
 
@@ -97,7 +98,8 @@ module Nickserver
       else
         @fetcher = Nickserver::Hkp::FetchKey.new
         @fetcher.get(uid).callback {|key|
-          send_response content: format_response(address: uid, openpgp: key)
+          response = Nickserver::Hkp::Response.new(uid, key)
+          send_response(status: response.status, content: response.content)
         }.errback {|status, msg|
           if status == 404
             send_not_found
@@ -106,10 +108,6 @@ module Nickserver
           end
         }
       end
-    end
-
-    def format_response(map)
-      map.to_json
     end
 
     #
