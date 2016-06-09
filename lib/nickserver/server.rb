@@ -75,12 +75,6 @@ module Nickserver
       end
     end
 
-    def send_key(uid)
-      get_key_from_uid(uid) do |key|
-        send_response content: format_response(address: uid, openpgp: key)
-      end
-    end
-
     def get_uid_from_request
       if @http_query_string
         params = CGI.parse(@http_query_string)
@@ -94,7 +88,7 @@ module Nickserver
       end
     end
 
-    def get_key_from_uid(uid)
+    def send_key(uid)
       if local_address?(uid)
         @source = Nickserver::CouchDB::Source.new(adapter)
         @source.query(uid) do |response|
@@ -103,7 +97,7 @@ module Nickserver
       else
         @fetcher = Nickserver::Hkp::FetchKey.new
         @fetcher.get(uid).callback {|key|
-          yield key
+          send_response content: format_response(address: uid, openpgp: key)
         }.errback {|status, msg|
           if status == 404
             send_not_found
