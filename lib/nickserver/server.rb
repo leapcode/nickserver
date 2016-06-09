@@ -5,7 +5,7 @@ silence_warnings do
 end
 require 'json'
 require 'nickserver/couch_db/source'
-require 'nickserver/hkp/response'
+require 'nickserver/hkp/source'
 require 'nickserver/adapters/em_http'
 
 
@@ -91,22 +91,12 @@ module Nickserver
 
     def send_key(uid)
       if local_address?(uid)
-        @source = Nickserver::CouchDB::Source.new(adapter)
-        @source.query(uid) do |response|
-          send_response(status: response.status, content: response.content)
-        end
+        source = Nickserver::CouchDB::Source.new(adapter)
       else
-        @fetcher = Nickserver::Hkp::FetchKey.new
-        @fetcher.get(uid).callback {|key|
-          response = Nickserver::Hkp::Response.new(uid, key)
-          send_response(status: response.status, content: response.content)
-        }.errback {|status, msg|
-          if status == 404
-            send_not_found
-          else
-            send_response(status: status, content: msg)
-          end
-        }
+        source = Nickserver::Hkp::Source.new(adapter)
+      end
+      source.query(uid) do |response|
+        send_response(status: response.status, content: response.content)
       end
     end
 
