@@ -29,17 +29,13 @@ class HkpTest < Minitest::Test
   def test_key_info_not_found
     uid = 'leaping_lemur@leap.se'
     stub_sks_vindex_reponse(uid, status: 404)
-    test_em_errback "Nickserver::Hkp::FetchKeyInfo.new.search '#{uid}'" do |error|
-      assert_equal 404, error
-    end
+    assert_response_status_for_uid uid, 404
   end
 
   def test_no_matching_key_found
     uid = 'leaping_lemur@leap.se'
     stub_sks_vindex_reponse(uid, status: 200)
-    test_em_errback "Nickserver::Hkp::FetchKeyInfo.new.search '#{uid}'" do |error|
-      assert_equal 404, error
-    end
+    assert_response_status_for_uid uid, 404
   end
 
   def test_fetch_key
@@ -48,8 +44,8 @@ class HkpTest < Minitest::Test
     stub_sks_vindex_reponse(uid, body: file_content(:leap_vindex_result))
     stub_sks_get_reponse(key_id, body: file_content(:leap_public_key))
 
-    test_em_callback "Nickserver::Hkp::FetchKey.new.get '#{uid}'" do |key_text|
-      assert_equal file_content(:leap_public_key), key_text
+    assert_response_for_uid(uid) do |response|
+      assert_equal file_content(:leap_public_key), response.body
     end
   end
 
@@ -60,18 +56,14 @@ class HkpTest < Minitest::Test
     stub_sks_vindex_reponse(uid, body: file_content(:leap_vindex_result))
     stub_sks_get_reponse(key_id, status: 404)
 
-    test_em_errback "Nickserver::Hkp::FetchKey.new.get '#{uid}'" do |error|
-      assert_equal 404, error
-    end
+    assert_response_status_for_uid uid, 404
   end
 
   def test_fetch_key_too_short
     uid    = 'chiiph@leap.se'
 
     stub_sks_vindex_reponse(uid, body: file_content(:short_key_vindex_result))
-    test_em_errback "Nickserver::Hkp::FetchKey.new.get '#{uid}'" do |error|
-      assert_equal 500, error
-    end
+    assert_response_status_for_uid uid, 500
   end
 
   #
@@ -109,6 +101,19 @@ class HkpTest < Minitest::Test
   end
 
   protected
+
+  def assert_response_status_for_uid(uid, status)
+    assert_response_for_uid(uid) do |response|
+      assert_equal status, response.status
+    end
+  end
+
+  def assert_response_for_uid(uid, &block)
+    EM.run do
+      Nickserver::Hkp::FetchKey.new(nil).get(uid, &block)
+      EM.stop
+    end
+  end
 
   #
   # Takes a code snippet that returns a Deferrable, and yields the callback result.

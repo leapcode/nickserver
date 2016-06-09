@@ -1,20 +1,20 @@
-require 'nickserver/hkp/response'
 module Nickserver::Hkp
   class Source
 
     def initialize(adapter)
+      @adapter = adapter
     end
 
-    def query(nick)
-      fetcher.get(nick).callback {|key|
-        yield Response.new(nick, key)
-        }.errback {|status, msg|
-          yield Nickserver::Response.new(status, msg)
-        }
+    def query(nick, &block)
+      fetcher.get(nick, &block)
     end
+
+    protected
+
+    attr_reader :adapter
 
     def fetcher
-      Nickserver::Hkp::FetchKey.new
+      Nickserver::Hkp::FetchKey.new(adapter)
     end
   end
 end

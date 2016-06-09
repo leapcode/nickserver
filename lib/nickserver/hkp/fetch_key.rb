@@ -1,4 +1,6 @@
 require 'em-http'
+require 'nickserver/response'
+require 'nickserver/hkp/response'
 
 #
 # Fetch keys via HKP
@@ -8,35 +10,36 @@ require 'em-http'
 module Nickserver; module Hkp
 
   class FetchKey
-    include EM::Deferrable
 
-    def get(uid)
-      FetchKeyInfo.new.search(uid).callback {|key_info_list|
+    def initialize(adapter)
+      @adapter = adapter
+    end
+
+    def get(nick, &block)
+      FetchKeyInfo.new.search(nick).callback {|key_info_list|
         best = pick_best_key(key_info_list)
-        get_key_by_fingerprint(best.keyid) {|key|
-          self.succeed key
-        }
+        get_key_by_fingerprint(nick, best.keyid, &block)
       }.errback {|status, msg|
-        self.fail status, msg
+        yield Nickserver::Response.new(status, msg)
       }
-      self
     end
 
     #
     # fetches ascii armored OpenPGP public key from the keyserver
     #
-    def get_key_by_fingerprint(key_id)
+    def get_key_by_fingerprint(nick, key_id)
       params = {op: 'get', search: "0x" + key_id, exact: 'on', options: 'mr'}
       http = EventMachine::HttpRequest.new(Config.hkp_url).get(query: params)
       http.callback {
-        if http.response_header.status != 200
-          self.fail http.response_header.status, "HKP Request failed"
+        status = http.response_header.status
+        if status != 200
+          yield Nickserver::Response.new status, "HKP Request failed"
         else
-          yield http.response
+          yield Response.new nick, http.response
         end
       }
       http.errback {
-        self.fail 500, http.error
+        yield Nickserver::Response.new 500, http.error
       }
     end
 
