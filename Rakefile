@@ -10,9 +10,11 @@ require "rake/testtask"
 ##
 
 Rake::TestTask.new do |t|
-  t.pattern = "test/unit/*_test.rb"
+  t.pattern = "test/**/*_test.rb"
+  t.libs << "test"
+  t.verbose = true
 end
-task :default => :test
+task default: :test
 
 ##
 ## GEM BUILDING AND INSTALLING
@@ -24,7 +26,7 @@ $spec      = eval(File.read(File.join($base_dir, $spec_path)))
 $gem_path  = File.join($base_dir, 'pkg', "#{$spec.name}-#{$spec.version}.gem")
 
 def run(cmd)
-  PTY.spawn(cmd) do |output, input, pid|
+  PTY.spawn(cmd) do |output, _input, _pid|
     begin
       while line = output.gets do
         puts line

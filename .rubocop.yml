@@ -1,0 +1,14 @@
+inherit_from: .rubocop_todo.yml
+
+Style/GuardClause:
+  Enabled: false
+
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+
+Lint/DeprecatedClassMethods:
+  Enabled: true
+
+# complains about our nested module end; end style
+Lint/EndAlignment:
+  Enabled: false
