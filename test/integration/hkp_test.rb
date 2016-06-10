@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'nickserver/hkp/source'
 
 class HkpTest < Minitest::Test
 
@@ -110,7 +111,7 @@ class HkpTest < Minitest::Test
 
   def assert_response_for_uid(uid, &block)
     EM.run do
-      Nickserver::Hkp::FetchKey.new(nil).get(uid, &block)
+      Nickserver::Hkp::Source.new(nil).query(uid, &block)
       EM.stop
     end
   end
