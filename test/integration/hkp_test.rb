@@ -47,7 +47,8 @@ class HkpTest < Minitest::Test
     stub_sks_get_reponse(key_id, body: file_content(:leap_public_key))
 
     assert_response_for_uid(uid) do |response|
-      assert_equal file_content(:leap_public_key), response.body
+      content = JSON.parse response.content
+      assert_equal file_content(:leap_public_key), content['openpgp']
     end
   end
 
@@ -76,7 +77,7 @@ class HkpTest < Minitest::Test
   def test_key_info_real_network
     real_network do
       uid = 'elijah@riseup.net'
-      test_em_callback "Nickserver::Hkp::FetchKeyInfo.new.search '#{uid}'" do |keys|
+      assert_key_info_for_uid uid do |keys|
         assert_equal 1, keys.size
         assert keys.first.keyid =~ /00440025$/
       end
@@ -93,7 +94,7 @@ class HkpTest < Minitest::Test
         #stub_config(:hkp_ca_file, file_path('autistici-ca.pem')) do
           assert File.exist?(Nickserver::Config.hkp_ca_file)
           uid = 'elijah@riseup.net'
-          test_em_callback "Nickserver::Hkp::FetchKeyInfo.new.search '#{uid}'" do |keys|
+          assert_key_info_for_uid uid do |keys|
             assert_equal 1, keys.size
             assert keys.first.keyid =~ /00440025$/
           end
@@ -112,58 +113,30 @@ class HkpTest < Minitest::Test
 
   def assert_response_for_uid(uid, &block)
     EM.run do
-      Nickserver::Hkp::Source.new(Nickserver::Adapters::EmHttp.new).query(uid, &block)
-      EM.stop
+      Nickserver::Hkp::Source.new(adapter).query uid do |response|
+        yield response
+        EM.stop
+      end
     end
   end
 
-  #
-  # Takes a code snippet that returns a Deferrable, and yields the callback result.
-  # Assertion fails if errback is called instead of callback.
-  #
-  # This method takes care of the calls to EM.run and EM.stop. It works kind of like EM.run_block,
-  # except I couldn't get run_block to work with multiple nested HTTP requests.
-  #
-  def test_em_callback(code, &block)
+  def assert_key_info_for_uid(uid, &block)
     EM.run do
-      deferrable = instance_eval(code)
-      deferrable.callback {|response|
+      Nickserver::Hkp::FetchKeyInfo.new(adapter).search uid do |status, keys|
+        assert_equal 200, status
+        yield keys
         EM.stop
-        yield response
-        return
-      }
-      deferrable.errback {|response, msg|
-        EM.stop
-        puts caller.join("\n")
-        flunk "Expecting callback, but errback invoked with response: #{response} #{msg}\n\n#{caller.join("\n")}"
-      }
+      end
     end
-    assert false, 'should not get here'
   end
 
-  #
-  # like test_em_callback, except value yielded is the result of errback, and
-  # we raise an exception if errback was not called.
-  #
-  def test_em_errback(code, &block)
-    EM.run do
-      deferrable = instance_eval(code)
-      deferrable.callback {|response|
-        EM.stop
-        flunk "Expecting errback, but callback invoked with response: #{response}"
-      }
-      deferrable.errback {|response|
-        EM.stop
-        yield response
-        return
-      }
-    end
-    assert false, 'should not get here'
+  def adapter
+    Nickserver::Adapters::EmHttp.new
   end
 
   def fetch_key_info(body_source, uid, &block)
     stub_sks_vindex_reponse(uid, body: file_content(body_source))
-    test_em_callback "Nickserver::Hkp::FetchKeyInfo.new.search '#{uid}'", &block
+    assert_key_info_for_uid(uid, &block)
   end
 
 end

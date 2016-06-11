@@ -14,12 +14,14 @@ module Nickserver; module Hkp
     end
 
     def query(nick, &block)
-      FetchKeyInfo.new.search(nick).callback {|key_info_list|
-        best = pick_best_key(key_info_list)
-        get_key_by_fingerprint(nick, best.keyid, &block)
-      }.errback {|status, msg|
-        yield Nickserver::Response.new(status, msg)
-      }
+      FetchKeyInfo.new(adapter).search(nick) do |status, response|
+        if status == 200
+          best = pick_best_key(response)
+          get_key_by_fingerprint(nick, best.keyid, &block)
+        else
+          yield Nickserver::Response.new(status, response)
+        end
+      end
     end
 
     protected
