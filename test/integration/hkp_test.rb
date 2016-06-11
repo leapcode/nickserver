@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'nickserver/hkp/source'
+require 'nickserver/adapters/em_http'
 
 class HkpTest < Minitest::Test
 
@@ -111,7 +112,7 @@ class HkpTest < Minitest::Test
 
   def assert_response_for_uid(uid, &block)
     EM.run do
-      Nickserver::Hkp::Source.new(nil).query(uid, &block)
+      Nickserver::Hkp::Source.new(Nickserver::Adapters::EmHttp.new).query(uid, &block)
       EM.stop
     end
   end

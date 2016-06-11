@@ -22,23 +22,22 @@ module Nickserver; module Hkp
       }
     end
 
+    protected
+
+    attr_reader :adapter
+
     #
     # fetches ascii armored OpenPGP public key from the keyserver
     #
     def get_key_by_fingerprint(nick, key_id)
       params = {op: 'get', search: "0x" + key_id, exact: 'on', options: 'mr'}
-      http = EventMachine::HttpRequest.new(Config.hkp_url).get(query: params)
-      http.callback {
-        status = http.response_header.status
-        if status != 200
-          yield Nickserver::Response.new status, "HKP Request failed"
+      adapter.get Config.hkp_url, query: params do |status, response|
+        if status == 200
+          yield Response.new nick, response
         else
-          yield Response.new nick, http.response
+          yield Nickserver::Response.new status, "HKP Request failed"
         end
-      }
-      http.errback {
-        yield Nickserver::Response.new 500, http.error
-      }
+      end
     end
 
     protected
