@@ -122,7 +122,7 @@ class HkpTest < Minitest::Test
 
   def assert_key_info_for_uid(uid, &block)
     EM.run do
-      Nickserver::Hkp::FetchKeyInfo.new(adapter).search uid do |status, keys|
+      Nickserver::Hkp::Source.new(adapter).search uid do |status, keys|
         assert_equal 200, status
         yield keys
         EM.stop
