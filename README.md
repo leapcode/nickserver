@@ -95,6 +95,6 @@ To run the test suite, run:
 
     rake
 
-The tests that actually make real network calls are disabled by default. To run these tests to, do this:
+The tests that actually make real network calls are enabled by default. To only run local, do this:
 
-    REAL_NET=true rake
+    ONLY_LOCAL=true rake

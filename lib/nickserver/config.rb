@@ -36,6 +36,21 @@ module Nickserver
       self.validate
     end
 
+    def self.couch_url
+      [ 'http://',
+        couch_auth,
+        couch_host,
+        ':',
+        couch_port,
+        '/',
+        couch_database
+      ].join
+    end
+
+    def self.couch_auth
+      "#{couch_user}:#{couch_password}@" if couch_user
+    end
+
     private
 
     def self.validate
@@ -59,7 +74,7 @@ module Nickserver
         YAML.load(File.read(file_path)).each do |key, value|
           begin
             self.send("#{key}=", value)
-          rescue NoMethodError => exc
+          rescue NoMethodError
             STDERR.puts "ERROR in file #{file_path}, '#{key}' is not a valid option"
             exit(1)
           end

@@ -1,10 +1,15 @@
 $LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 
 require 'rubygems'
+require 'kernel_ext'
 require 'bundler/setup'
 require 'minitest/autorun'
-require 'webmock/minitest'
+silence_warnings do
+  require 'webmock/minitest'
+end
 require 'nickserver'
+require 'minitest/pride'
+require 'minitest/hell'
 
 TESTING = true
 
@@ -27,7 +32,7 @@ class Minitest::Test
   end
 
   def real_network
-    if ENV['REAL_NET'] == 'true'
+    unless ENV['ONLY_LOCAL'] == 'true'
       WebMock.allow_net_connect!
       yield
       WebMock.disable_net_connect!
@@ -53,7 +58,7 @@ class Minitest::Test
     Nickserver::Config.stub :couch_host, 'notlocalhost' do
       options = {status: 200, body: ""}.merge(opts)
       query = "\?key=#{"%22#{uid}%22"}&reduce=false"
-      stub_http_request(:get, /#{Regexp.escape(Nickserver::Couch::FetchKey.couch_url)}.*#{query}/).to_return(options)
+      stub_http_request(:get, /#{Regexp.escape(Nickserver::Config.couch_url)}.*#{query}/).to_return(options)
       yield
     end
   end

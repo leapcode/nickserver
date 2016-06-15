@@ -1,29 +1,37 @@
 #
-# Simple parser for HKP KeyInfo responses.
+# Simple parser for Hkp KeyInfo responses.
 #
 # Focus is on simple here. Trying to avoid state and sideeffects.
 # Parsing a response with 12 keys and validating them takes 2ms.
 # So no need for memoization and making things more complex.
 #
-module Nickserver; module HKP
+module Nickserver; module Hkp
   class ParseKeyInfo
 
     # for this regexp to work, the source text must end in a trailing "\n",
     # which the output of sks does.
     MATCH_PUB_KEY = /(^pub:.+?\n(^uid:.+?\n)+)/m
 
-    #  header        -- header of the hkp response
+    #  status        -- http status of the hkp response
     #  vindex_result -- raw output from a vindex hkp query (machine readable)
-    def initialize(header, vindex_result)
-      @header = header
+    def initialize(status, vindex_result)
+      @status = status
       @vindex_result = vindex_result
     end
 
-    def status(uid)
+    def status_for(uid)
       if hkp_ok? && keys(uid).empty?
         error_status(uid)
       else
-        header.status
+        status
+      end
+    end
+
+    def response_for(uid)
+      if keys(uid).any?
+        keys(uid)
+      else
+        msg(uid)
       end
     end
 
@@ -41,7 +49,7 @@ module Nickserver; module HKP
 
     protected
 
-    attr_reader :header
+    attr_reader :status
     attr_reader :vindex_result
 
     def error_status(uid)
@@ -78,7 +86,7 @@ module Nickserver; module HKP
     end
 
     def hkp_ok?
-      header.status == 200
+      status == 200
     end
 
     def error_message(uid, key, err)

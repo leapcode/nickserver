@@ -1,6 +1,13 @@
+require 'kernel_ext'
 require 'eventmachine'
-require 'evma_httpserver'
+silence_warnings do
+  require 'evma_httpserver'
+end
 require 'json'
+require 'nickserver/couch_db/source'
+require 'nickserver/hkp/source'
+require 'nickserver/adapters/em_http'
+
 
 #
 # This is the main HTTP server that clients connect to in order to fetch keys
@@ -64,12 +71,8 @@ module Nickserver
       response.status = options[:status]
       response.content_type options[:content_type]
       response.content = options[:content]
-      response.send_response
-    end
-
-    def send_key(uid)
-      get_key_from_uid(uid) do |key|
-        send_response content: format_response(address: uid, openpgp: key)
+      silence_warnings do
+        response.send_response
       end
     end
 
@@ -86,25 +89,15 @@ module Nickserver
       end
     end
 
-    def get_key_from_uid(uid)
-      fetcher = if local_address?(uid)
-        Nickserver::Couch::FetchKey.new
+    def send_key(uid)
+      if local_address?(uid)
+        source = Nickserver::CouchDB::Source.new(adapter)
       else
-        Nickserver::HKP::FetchKey.new
+        source = Nickserver::Hkp::Source.new(adapter)
       end
-      fetcher.get(uid).callback {|key|
-        yield key
-      }.errback {|status, msg|
-        if status == 404
-          send_not_found
-        else
-          send_response(status: status, content: msg)
-        end
-      }
-    end
-
-    def format_response(map)
-      map.to_json
+      source.query(uid) do |response|
+        send_response(status: response.status, content: response.content)
+      end
     end
 
     #
@@ -127,8 +120,13 @@ module Nickserver
           return uid_domain == host
         end
       end
-    rescue
+    rescue # XXX what are we rescueing here?
       return false
     end
+
+    def adapter
+      @adapter ||= Nickserver::Adapters::EmHttp.new
+    end
+
   end
 end
