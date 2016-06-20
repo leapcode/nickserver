@@ -11,11 +11,7 @@ require "nickserver/hkp/key_info"
 #
 
 module Nickserver; module Hkp
-  class Source
-
-    def initialize(adapter)
-      @adapter = adapter
-    end
+  class Source < Nickserver::Source
 
     def query(nick, &block)
       search(nick) do |status, response|
@@ -36,8 +32,6 @@ module Nickserver; module Hkp
     end
 
     protected
-
-    attr_reader :adapter
 
     #
     # for now, just pick the newest key.
