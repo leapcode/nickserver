@@ -38,7 +38,7 @@ module Nickserver
         source = Nickserver::Hkp::Source.new(adapter)
       end
       source.query(uid) do |response|
-        send_response(status: response.status, content: response.content)
+        send_response response.status, response.content
       end
     end
 
@@ -64,19 +64,15 @@ module Nickserver
       end
     end
     def send_error(msg = "not supported")
-      send_response(status: 500, content: "500 #{msg}\n")
+      send_response 500, "500 #{msg}\n"
     end
 
     def send_not_found(msg = "Not Found")
-      send_response(status: 404, content: "404 #{msg}\n")
+      send_response 404, "404 #{msg}\n"
     end
 
-    def send_response(opts = {})
-      responder.send_response default_response.merge(opts)
-    end
-
-    def default_response
-      {status: 200, content_type: 'text/plain', content: ''}
+    def send_response(status = 200, content = '')
+      responder.respond status, content
     end
 
     attr_reader :responder, :adapter

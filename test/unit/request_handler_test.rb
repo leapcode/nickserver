@@ -21,8 +21,7 @@ class Nickserver::RequestHandlerTest < Minitest::Test
   end
 
   def assert_response(args)
-    args[:content_type] ||= 'text/plain'
-    responder.expect :send_response, nil, [args]
+    responder.expect :respond, nil, [args[:status], args[:content]]
     handler.respond_to @params, @headers
     responder.verify
   end

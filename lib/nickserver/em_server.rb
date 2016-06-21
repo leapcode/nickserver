@@ -23,11 +23,11 @@ module Nickserver
       handler.respond_to params, @http_headers
     end
 
-    def send_response(options = {})
+    def respond(status, content)
       response = EM::DelegatedHttpResponse.new(self)
-      response.status = options[:status]
-      response.content_type options[:content_type]
-      response.content = options[:content]
+      response.status = status
+      response.content_type 'text/plain'
+      response.content = content
       silence_warnings do
         response.send_response
       end
