@@ -1,8 +1,20 @@
 require 'test_helper'
 require 'nickserver/hkp/source'
 require 'nickserver/adapters/celluloid_http'
+require 'celluloid/test'
 
 class HkpTest < Minitest::Test
+
+  def setup
+    super
+    Celluloid.boot
+  end
+
+  def teardown
+    Celluloid.shutdown
+    super
+  end
+
 
   def test_key_info_expired
     fetch_key_info(:hkp_vindex_result, 'lemur@leap.se') do |keys|

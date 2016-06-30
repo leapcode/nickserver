@@ -1,8 +1,18 @@
 require 'test_helper'
 require 'nickserver/adapters/celluloid_http'
-require 'byebug'
+require 'celluloid/test'
 
 class Nickserver::Adapters::CelluloidHttpTest < Minitest::Test
+
+  def setup
+    super
+    Celluloid.boot
+  end
+
+  def teardown
+    Celluloid.shutdown
+    super
+  end
 
   def test_successful_request
     url = 'http://url.to'
