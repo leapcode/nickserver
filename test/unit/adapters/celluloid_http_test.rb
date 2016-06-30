@@ -25,6 +25,15 @@ class Nickserver::Adapters::CelluloidHttpTest < Minitest::Test
     end
   end
 
+  def test_https_for_hkp
+    url = Nickserver::Config.hkp_url
+    real_network do
+      adapter.get url do |status, _body|
+        assert_equal 404, status
+      end
+    end
+  end
+
   protected
 
   def adapter
