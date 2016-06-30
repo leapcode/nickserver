@@ -61,7 +61,7 @@ module Nickserver
         if host_header.nil?
           send_error("HTTP request must include a Host header.")
         else
-          host = host_header.split(':')[1].strip.sub(/^nicknym\./, '')
+          host = host_header.split(':')[0].strip.sub(/^nicknym\./, '')
           return uid_domain == host
         end
       end

@@ -55,7 +55,7 @@ class NickserverTest < Minitest::Test
     uid    = "bananas@" + domain
     stub_couch_response(uid, status: 404) do
       start do
-        params = {query: {"address" => uid}, head: {host: domain}}
+        params = {query: {"address" => uid}, head: {"Host" => domain}}
         get(params) do |response|
           assert_equal 404, response.code
         end
@@ -81,7 +81,7 @@ class NickserverTest < Minitest::Test
     uid    = "blue@" + domain
     stub_couch_response(uid, body: file_content(:blue_couchdb_result)) do
       start do
-        params = {query: {"address" => uid}, head: {host: domain}}
+        params = {query: {"address" => uid}, head: {"Host" => domain}}
         get(params) do |response|
           assert_equal file_content(:blue_nickserver_result), response.to_s
         end
@@ -112,15 +112,15 @@ class NickserverTest < Minitest::Test
   #
   # http GET requests to nickserver
   #
-  def get(params, &block)
-    request(:get, params[:query], &block)
+  def get(options = {}, &block)
+    request(:get, params: options[:query], head: options[:head], &block)
   end
 
   #
   # http POST requests to nickserver
   #
-  def post(params, &block)
-    request(:post, params[:body], &block)
+  def post(options, &block)
+    request(:post, params: options[:body], head: options[:head], &block)
   end
 
   #
@@ -128,10 +128,11 @@ class NickserverTest < Minitest::Test
   #
   # this works because http requests to 127.0.0.1 are not stubbed, but requests to other domains are.
   #
-  def request(method, params)
-    request = HTTP.request method, "http://127.0.0.1:#{config.port}/",
-      params: params
-    yield request
+  def request(method, options = {})
+    response = HTTP.
+      headers(options.delete(:head)).
+      request method, "http://127.0.0.1:#{config.port}/", options
+    yield response
   end
 
 end
