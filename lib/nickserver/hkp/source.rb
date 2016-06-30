@@ -1,3 +1,4 @@
+require 'nickserver/source'
 require 'nickserver/response'
 require 'nickserver/hkp/response'
 require 'nickserver/hkp/client'

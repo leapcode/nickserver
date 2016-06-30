@@ -20,7 +20,5 @@ load_local_gem
 require 'nickserver'
 
 Nickserver::Daemon.run('nickserver') do
-  EventMachine.run do
-    Nickserver::Server.start
-  end
+  Nickserver::Server.start
 end

@@ -1,3 +1,6 @@
+require 'nickserver/hkp/source'
+require 'nickserver/couch_db/source'
+
 module Nickserver
   class RequestHandler
 
@@ -54,7 +57,7 @@ module Nickserver
         return uid_domain == Config.domain
       else
         # no domain configured, use Host header
-        host_header = headers.split(/\0/).grep(/^Host: /).first
+        host_header = headers['Host']
         if host_header.nil?
           send_error("HTTP request must include a Host header.")
         else
