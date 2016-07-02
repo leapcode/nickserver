@@ -18,18 +18,16 @@ class Nickserver::Adapters::CelluloidHttpTest < Minitest::Test
     stub_http_request(:get, url)
       .with(query: {key: :value})
       .to_return status: 200, body: 'body'
-    adapter.get(url, query: {key: :value}) do |status, body|
-      assert_equal 200, status
-      assert_equal 'body', body
-    end
+    status, body = adapter.get(url, query: {key: :value})
+    assert_equal 200, status
+    assert_equal 'body', body
   end
 
   def test_https_for_hkp
     url = Nickserver::Config.hkp_url
     real_network do
-      adapter.get url do |status, _body|
-        assert_equal 404, status
-      end
+      status, _body = adapter.get url
+      assert_equal 404, status
     end
   end
 

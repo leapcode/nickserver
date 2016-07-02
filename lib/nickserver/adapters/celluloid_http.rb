@@ -13,7 +13,7 @@ module Nickserver::Adapters
         params: options[:query],
         ssl_context: ctx,
         ssl_socket_class: Celluloid::IO::SSLSocket
-      yield response.code, response.to_s
+      return response.code, response.to_s
     end
 
     def ctx

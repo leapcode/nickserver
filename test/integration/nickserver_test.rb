@@ -18,7 +18,12 @@ class NickserverTest < Minitest::Test
 
   def setup
     super
-    Celluloid.shutdown; Celluloid.boot
+    Celluloid.boot
+  end
+
+  def teardown
+    Celluloid.shutdown
+    super
   end
 
   def test_GET_served_via_SKS

@@ -40,9 +40,8 @@ module Nickserver
       else
         source = Nickserver::Hkp::Source.new(adapter)
       end
-      source.query(uid) do |response|
-        send_response response.status, response.content
-      end
+      response = source.query(uid)
+      send_response response.status, response.content
     end
 
     #
