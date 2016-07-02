@@ -1,5 +1,7 @@
 require 'nickserver/adapters'
-# require 'celluloid/io'
+silence_warnings do
+  require 'celluloid/io'
+end
 require 'http'
 
 module Nickserver::Adapters

@@ -1,6 +1,5 @@
 require 'test_helper'
 require 'nickserver/adapters/celluloid_http'
-require 'celluloid/test'
 
 class Nickserver::Adapters::CelluloidHttpTest < Minitest::Test
 

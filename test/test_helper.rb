@@ -7,6 +7,7 @@ require 'minitest/autorun'
 silence_warnings do
   require 'webmock/minitest'
 end
+require 'celluloid/test'
 require 'nickserver'
 require 'minitest/pride'
 require 'minitest/hell'

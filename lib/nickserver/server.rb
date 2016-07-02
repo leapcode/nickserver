@@ -6,7 +6,6 @@ require 'nickserver/reel_server'
 #
 # This is the main HTTP server that clients connect to in order to fetch keys
 #
-# For info on EM::HttpServer, see https://github.com/eventmachine/evma_httpserver
 #
 module Nickserver
   class Server

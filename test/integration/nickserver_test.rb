@@ -1,6 +1,5 @@
 require 'test_helper'
 require 'json'
-require 'celluloid/test'
 
 #
 # Some important notes to understanding these tests:

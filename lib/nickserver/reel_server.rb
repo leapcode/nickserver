@@ -1,5 +1,6 @@
-require 'celluloid/autostart'
-require 'reel'
+silence_warnings do
+  require 'reel'
+end
 require 'nickserver/adapters/celluloid_http'
 require 'nickserver/request_handler'
 
@@ -12,6 +13,12 @@ module Nickserver
 
     def initialize(host = "127.0.0.1", port = 3000)
       super(host, port, &method(:on_connection))
+    end
+
+    def handle_connection(*args)
+      silence_warnings do
+        super
+      end
     end
 
     def on_connection(connection)
