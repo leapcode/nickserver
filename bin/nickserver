@@ -21,4 +21,5 @@ require 'nickserver'
 
 Nickserver::Daemon.run('nickserver') do
   Nickserver::Server.start
+  sleep
 end

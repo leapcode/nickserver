@@ -8,7 +8,7 @@ module Nickserver
   class ReelServer < Reel::Server::HTTP
 
     def self.start(options = {})
-      new(options[:host], options[:port]).run
+      new(options[:host], options[:port])
     end
 
     def initialize(host = "127.0.0.1", port = 3000)
