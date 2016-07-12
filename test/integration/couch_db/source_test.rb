@@ -1,6 +1,5 @@
 require 'test_helper'
 require 'file_content'
-require 'helpers/test_adapter'
 require 'nickserver/couch_db/source'
 
 module Nickserver::CouchDB
@@ -8,12 +7,17 @@ module Nickserver::CouchDB
   include FileContent
 
     def test_couch_query_and_response
-      adapter = TestAdapter.new 200, file_content(:blue_couchdb_result)
+      adapter = adapter_returns 200, file_content(:blue_couchdb_result)
       source = Source.new adapter
       source.query 'blue@example.org' do |response|
         assert_equal 200, response.status
         assert_equal file_content(:blue_nickserver_result), response.content
       end
+    end
+
+    def adapter_returns(*return_values)
+      adapter = Minitest::Mock.new
+      adapter.expect :get, return_values, [String, Hash]
     end
   end
 end

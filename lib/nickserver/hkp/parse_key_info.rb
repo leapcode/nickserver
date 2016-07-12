@@ -19,7 +19,8 @@ module Nickserver; module Hkp
       @vindex_result = vindex_result
     end
 
-    def status_for(uid)
+    def status_for(email)
+      uid = email.to_s
       if hkp_ok? && keys(uid).empty?
         error_status(uid)
       else
@@ -27,13 +28,16 @@ module Nickserver; module Hkp
       end
     end
 
-    def response_for(uid)
+    def response_for(email)
+      uid = email.to_s
       if keys(uid).any?
         keys(uid)
       else
         msg(uid)
       end
     end
+
+    protected
 
     def keys(uid)
       key_infos(uid).reject { |key| error_for_key(key) }
@@ -46,8 +50,6 @@ module Nickserver; module Hkp
         "Could not fetch keyinfo."
       end
     end
-
-    protected
 
     attr_reader :status
     attr_reader :vindex_result

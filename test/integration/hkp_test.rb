@@ -1,8 +1,19 @@
 require 'test_helper'
 require 'nickserver/hkp/source'
-require 'nickserver/adapters/em_http'
+require 'nickserver/adapters/celluloid_http'
 
 class HkpTest < Minitest::Test
+
+  def setup
+    super
+    Celluloid.boot
+  end
+
+  def teardown
+    Celluloid.shutdown
+    super
+  end
+
 
   def test_key_info_expired
     fetch_key_info(:hkp_vindex_result, 'lemur@leap.se') do |keys|
@@ -89,9 +100,9 @@ class HkpTest < Minitest::Test
     ca_file = file_path('mayfirst-ca.pem')
 
     real_network do
-      stub_config(:hkp_url, hkp_url) do
-        stub_config(:hkp_ca_file, ca_file) do
-        #stub_config(:hkp_ca_file, file_path('autistici-ca.pem')) do
+      config.stub(:hkp_url, hkp_url) do
+        config.stub(:hkp_ca_file, ca_file) do
+        #config.stub(:hkp_ca_file, file_path('autistici-ca.pem')) do
           assert File.exist?(Nickserver::Config.hkp_ca_file)
           uid = 'elijah@riseup.net'
           assert_key_info_for_uid uid do |keys|
@@ -112,26 +123,20 @@ class HkpTest < Minitest::Test
   end
 
   def assert_response_for_uid(uid, &block)
-    EM.run do
-      Nickserver::Hkp::Source.new(adapter).query uid do |response|
-        yield response
-        EM.stop
-      end
+    Nickserver::Hkp::Source.new(adapter).query uid do |response|
+      yield response
     end
   end
 
   def assert_key_info_for_uid(uid, &block)
-    EM.run do
-      Nickserver::Hkp::Source.new(adapter).search uid do |status, keys|
-        assert_equal 200, status
-        yield keys
-        EM.stop
-      end
+    Nickserver::Hkp::Source.new(adapter).search uid do |status, keys|
+      assert_equal 200, status
+      yield keys
     end
   end
 
   def adapter
-    Nickserver::Adapters::EmHttp.new
+    Nickserver::Adapters::CelluloidHttp.new
   end
 
   def fetch_key_info(body_source, uid, &block)

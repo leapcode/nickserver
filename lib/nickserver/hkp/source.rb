@@ -1,3 +1,4 @@
+require 'nickserver/source'
 require 'nickserver/response'
 require 'nickserver/hkp/response'
 require 'nickserver/hkp/client'
@@ -13,22 +14,20 @@ require "nickserver/hkp/key_info"
 module Nickserver; module Hkp
   class Source < Nickserver::Source
 
-    def query(nick, &block)
-      search(nick) do |status, response|
-        if status == 200
-          best = pick_best_key(response)
-          get_key_by_fingerprint(nick, best.keyid, &block)
-        else
-          yield Nickserver::Response.new(status, response)
-        end
+    def query(nick)
+      status, response = search(nick)
+      if status == 200
+        best = pick_best_key(response)
+        get_key_by_fingerprint(nick, best.keyid)
+      else
+        Nickserver::Response.new(status, response)
       end
     end
 
-    def search(nick, &block)
-      client.get_key_infos_by_email(nick) do |status, response|
-        parser = ParseKeyInfo.new status, response
-        yield parser.status_for(nick), parser.response_for(nick)
-      end
+    def search(nick)
+      status, response = client.get_key_infos_by_email(nick)
+      parser = ParseKeyInfo.new status, response
+      return parser.status_for(nick), parser.response_for(nick)
     end
 
     protected
@@ -44,12 +43,11 @@ module Nickserver; module Hkp
     end
 
     def get_key_by_fingerprint(nick, fingerprint)
-      client.get_key_by_fingerprint fingerprint do |status, response|
-        if status == 200
-          yield Response.new nick, response
-        else
-          yield Nickserver::Response.new status, "HKP Request failed"
-        end
+      status, response = client.get_key_by_fingerprint fingerprint
+      if status == 200
+        Response.new nick, response
+      else
+        Nickserver::Response.new status, "HKP Request failed"
       end
     end
 

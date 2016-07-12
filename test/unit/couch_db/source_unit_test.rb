@@ -7,10 +7,9 @@ module Nickserver::CouchDB
     def test_query
       address = "nick@domain.tl"
       adapter = Minitest::Mock.new
-      adapter.expect :get, nil,
+      adapter.expect :get, [200, nil],
         [String,  {query: { reduce: "false", key: "\"#{address}\"" }}]
-      query = Source.new(adapter)
-      query.query address
+      Source.new(adapter).query address
       adapter.verify
     end
   end

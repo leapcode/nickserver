@@ -11,9 +11,8 @@ module Nickserver::CouchDB
     VIEW = '/_design/Identity/_view/pgp_key_by_email'
 
     def query(nick)
-      adapter.get url, query: query_for(nick) do |status, body|
-        yield Response.new(nick, status: status, body: body)
-      end
+      status, body = adapter.get url, query: query_for(nick)
+      Response.new(nick, status: status, body: body)
     end
 
     protected

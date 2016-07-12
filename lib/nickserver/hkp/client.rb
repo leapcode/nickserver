@@ -21,7 +21,7 @@ module Nickserver; module Hkp
     # used to fetch an array of KeyInfo objects that match the given email
     #
     def get_key_infos_by_email(email, &block)
-      get op: 'vindex', search: email, fingerprint: 'on', &block
+      get op: 'vindex', search: email.to_s, fingerprint: 'on'
     end
 
     #
@@ -35,10 +35,11 @@ module Nickserver; module Hkp
 
     attr_reader :adapter
 
-    def get(query, &block)
+    def get(query)
       # in practice, exact=on seems to have no effect
       query = {exact: 'on', options: 'mr'}.merge query
-      adapter.get Config.hkp_url, query: query, &block
+      response = adapter.get Config.hkp_url, query: query
+      return response
     end
   end
 end; end

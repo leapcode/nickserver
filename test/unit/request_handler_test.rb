@@ -13,6 +13,11 @@ class Nickserver::RequestHandlerTest < Minitest::Test
     assert_response status: 500, content: "500 Not a valid address\n"
   end
 
+  def test_missing_domain
+    handle address: ['valid@email.tld']
+    assert_response status: 500, content: "500 HTTP request must include a Host header.\n"
+  end
+
   protected
 
   def handle(params = {}, headers = {})
@@ -21,8 +26,7 @@ class Nickserver::RequestHandlerTest < Minitest::Test
   end
 
   def assert_response(args)
-    args[:content_type] ||= 'text/plain'
-    responder.expect :send_response, nil, [args]
+    responder.expect :respond, nil, [args[:status], args[:content]]
     handler.respond_to @params, @headers
     responder.verify
   end

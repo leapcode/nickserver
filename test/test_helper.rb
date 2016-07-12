@@ -7,6 +7,7 @@ require 'minitest/autorun'
 silence_warnings do
   require 'webmock/minitest'
 end
+require 'celluloid/test'
 require 'nickserver'
 require 'minitest/pride'
 require 'minitest/hell'
@@ -48,26 +49,22 @@ class Minitest::Test
 
   def stub_sks_get_reponse(key_id, opts = {})
     options = {status: 200, body: ""}.merge(opts)
-    stub_http_request(:get, Nickserver::Config.hkp_url).with(
+    stub_http_request(:get, config.hkp_url).with(
       query: {op: 'get', search: "0x"+key_id, exact: 'on', options: 'mr'}
     ).to_return(options)
   end
 
   def stub_couch_response(uid, opts = {})
     # can't stub localhost, so set couch_host to anything else
-    Nickserver::Config.stub :couch_host, 'notlocalhost' do
+    config.stub :couch_host, 'notlocalhost' do
       options = {status: 200, body: ""}.merge(opts)
       query = "\?key=#{"%22#{uid}%22"}&reduce=false"
-      stub_http_request(:get, /#{Regexp.escape(Nickserver::Config.couch_url)}.*#{query}/).to_return(options)
+      stub_http_request(:get, /#{Regexp.escape(config.couch_url)}.*#{query}/).to_return(options)
       yield
     end
   end
 
-  #
-  # temporarily stubs the config property for the duration of the given block
-  #
-  def stub_config(property, value, &block)
-    Nickserver::Config.stub(property, value, &block)
+  def config
+    Nickserver::Config
   end
-
 end
