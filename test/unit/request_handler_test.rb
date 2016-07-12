@@ -18,11 +18,20 @@ class Nickserver::RequestHandlerTest < Minitest::Test
     assert_response status: 500, content: "500 HTTP request must include a Host header.\n"
   end
 
+  def test_email_from_hkp
+    handle address: ['valid@email.tld'], headers: { "Host" => "http://nickserver.me" }
+    source = Minitest::Mock.new
+    source.expect :query, Nickserver::Response.new(200, "fake content"), [Nickserver::EmailAddress]
+    Nickserver::Hkp::Source.stub :new, source do
+      assert_response status: 200, content: "200 fake content"
+    end
+   end
+
   protected
 
-  def handle(params = {}, headers = {})
+  def handle(params = {})
+    @headers = params.delete(:headers) || {}
     @params = Hash[ params.map{ |k,v| [k.to_s, v] } ]
-    @headers = headers
   end
 
   def assert_response(args)
