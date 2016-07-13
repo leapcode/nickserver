@@ -13,7 +13,7 @@ module Nickserver
       if params && params["address"] && params["address"].any?
         by_email(params, headers)
       elsif params && params["fingerprint"] && params["fingerprint"].any?
-        # do something else
+        by_fingerprint(params)
       else
         send_not_found
       end
@@ -35,7 +35,16 @@ module Nickserver
       end
     end
 
-    #def by_fingerprint(params)
+    def by_fingerprint(params)
+      fingerprint = params["fingerprint"].first
+      if fingerprint.length == 40 && !fingerprint[/\H/]
+        source = Nickserver::Hkp::Source.new(adapter)
+        key_response = source.get_key_by_fingerprint(fingerprint)
+        send_response key_response.status, key_response.content
+      else
+        send_error('Fingerprint invalid: ' + fingerprint)
+      end
+    end
 
     def send_key(email, headers)
       if local_address?(email, headers)
