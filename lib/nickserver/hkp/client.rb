@@ -27,8 +27,8 @@ module Nickserver; module Hkp
     #
     # fetches ascii armored OpenPGP public key from the keyserver
     #
-    def get_key_by_fingerprint(fingerprint, &block)
-      get op: 'get', search: "0x" + fingerprint, &block
+    def get_key_by_fingerprint(fingerprint)
+      get op: 'get', search: "0x" + fingerprint
     end
 
     protected

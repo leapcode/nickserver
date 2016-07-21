@@ -26,7 +26,7 @@ class NickserverTest < Minitest::Test
     super
   end
 
-  def test_GET_served_via_SKS
+  def test_GET_key_by_email_address_served_via_SKS
     uid    = 'cloudadmin@leap.se'
     key_id = 'E818C478D3141282F7590D29D041EB11B1647490'
     stub_sks_vindex_reponse(uid, body: file_content(:leap_vindex_result))
@@ -40,15 +40,13 @@ class NickserverTest < Minitest::Test
     end
   end
 
-  def test_POST_served_via_SKS
-    uid    = 'cloudadmin@leap.se'
-    key_id = 'E818C478D3141282F7590D29D041EB11B1647490'
-    stub_sks_vindex_reponse(uid, body: file_content(:leap_vindex_result))
-    stub_sks_get_reponse(key_id, body: file_content(:leap_public_key))
+  def test_GET_key_by_fingerprint_served_via_SKS
+    fingerprint = 'E818C478D3141282F7590D29D041EB11B1647490'
+    stub_sks_get_reponse(fingerprint, body: file_content(:leap_public_key))
 
     start do
-      params = {body: {"address" => uid}}
-      post(params) do |response|
+      params = {query: {"fingerprint" => fingerprint}}
+      get(params) do |response|
         assert_equal file_content(:leap_public_key), JSON.parse(response.to_s)["openpgp"]
       end
     end

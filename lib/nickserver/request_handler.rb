@@ -10,14 +10,14 @@ module Nickserver
     end
 
     def respond_to(params, headers)
-      email = get_email_from_params(params)
-      if email.nil?
-        send_not_found
-      elsif email.invalid?
-        send_error("Not a valid address")
+      if params && params["address"] && params["address"].any?
+        by_email(params, headers)
+      elsif params && params["fingerprint"] && params["fingerprint"].any?
+        by_fingerprint(params)
       else
-        send_key(email, headers)
+        send_not_found
       end
+
     rescue RuntimeError => exc
       puts "Error: #{exc}"
       puts exc.backtrace
@@ -26,9 +26,23 @@ module Nickserver
 
     protected
 
-    def get_email_from_params(params)
-      if params && params["address"] && params["address"].any?
-        EmailAddress.new(params["address"].first)
+    def by_email(params, headers)
+      email = EmailAddress.new(params["address"].first)
+      if email.invalid?
+        send_error("Not a valid address")
+      else
+        send_key(email, headers)
+      end
+    end
+
+    def by_fingerprint(params)
+      fingerprint = params["fingerprint"].first
+      if fingerprint.length == 40 && !fingerprint[/\H/]
+        source = Nickserver::Hkp::Source.new(adapter)
+        key_response = source.get_key_by_fingerprint(fingerprint)
+        send_response key_response.status, key_response.content
+      else
+        send_error('Fingerprint invalid: ' + fingerprint)
       end
     end
 

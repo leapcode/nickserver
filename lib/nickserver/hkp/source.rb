@@ -18,7 +18,7 @@ module Nickserver; module Hkp
       status, response = search(nick)
       if status == 200
         best = pick_best_key(response)
-        get_key_by_fingerprint(nick, best.keyid)
+        get_key_by_fingerprint(best.keyid, nick)
       else
         Nickserver::Response.new(status, response)
       end
@@ -28,6 +28,15 @@ module Nickserver; module Hkp
       status, response = client.get_key_infos_by_email(nick)
       parser = ParseKeyInfo.new status, response
       return parser.status_for(nick), parser.response_for(nick)
+    end
+
+    def get_key_by_fingerprint(fingerprint, nick = nil)
+      status, response = client.get_key_by_fingerprint fingerprint
+      if status == 200
+        Response.new nick, response
+      else
+        Nickserver::Response.new status, "HKP Request failed"
+      end
     end
 
     protected
@@ -40,15 +49,6 @@ module Nickserver; module Hkp
     #
     def pick_best_key(key_info_list)
       key_info_list.sort {|a,b| a.creationdate <=> b.creationdate}.last
-    end
-
-    def get_key_by_fingerprint(nick, fingerprint)
-      status, response = client.get_key_by_fingerprint fingerprint
-      if status == 200
-        Response.new nick, response
-      else
-        Nickserver::Response.new status, "HKP Request failed"
-      end
     end
 
     def client
