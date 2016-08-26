@@ -40,70 +40,98 @@ module Nickserver
 
     def respond_to(params, headers)
       request = Request.new params, headers
-      if request.email
-        by_email(request)
-      elsif request.fingerprint
-        by_fingerprint(request)
-      else
-        send_not_found
-      end
-
-    rescue RuntimeError => exc
-      puts "Error: #{exc}"
-      puts exc.backtrace
-      send_error(exc.to_s)
+      response = handle request
+      send_response response.status, response.content
     end
 
     protected
 
-    def by_email(request)
-      email = EmailAddress.new(request.email)
-      if email.invalid?
-        send_error("Not a valid address")
+    def handle(request)
+      handler = handler_for_request request
+      handler.call request
+    rescue RuntimeError => exc
+      puts "Error: #{exc}"
+      puts exc.backtrace
+      ErrorResponse.new(exc.to_s)
+    end
+
+    def handler_for_request(request)
+      if request.email
+        EmailHandler.new adapter
+      elsif request.fingerprint
+        FingerprintHandler.new adapter
       else
-        send_key(email, request)
+        Proc.new { Nickserver::Response.new(404, "Not Found\n") }
       end
     end
 
-    def by_fingerprint(request)
-      fingerprint = request.fingerprint
-      if fingerprint.length == 40 && !fingerprint[/\H/]
-        source = Nickserver::Hkp::Source.new(adapter)
-        key_response = source.get_key_by_fingerprint(fingerprint)
-        send_response key_response.status, key_response.content
-      else
-        send_error('Fingerprint invalid: ' + fingerprint)
+    class EmailHandler
+
+      def initialize(adapter)
+        @adapter = adapter
       end
-    end
 
-    def send_key(email, request)
-      if local_address?(email, request)
-        source = Nickserver::CouchDB::Source.new(adapter)
-      else
-        source = Nickserver::Hkp::Source.new(adapter)
+      def call(request)
+        email = EmailAddress.new(request.email)
+        if email.invalid?
+          ErrorResponse.new("Not a valid address")
+        else
+          send_key(email, request)
+        end
       end
-      response = source.query(email)
-      send_response response.status, response.content
-    rescue MissingHostHeader
-      send_error("HTTP request must include a Host header.")
+
+      protected
+
+      def send_key(email, request)
+        if local_address?(email, request)
+          source = Nickserver::CouchDB::Source.new(adapter)
+        else
+          source = Nickserver::Hkp::Source.new(adapter)
+        end
+        source.query(email)
+      rescue MissingHostHeader
+        ErrorResponse.new("HTTP request must include a Host header.")
+      end
+
+      #
+      # Return true if the user address is for a user of this service provider.
+      # e.g. if the provider is example.org, then alice@example.org returns true.
+      #
+      # If 'domain' is not configured, we rely on the Host header of the HTTP request.
+      #
+      def local_address?(email, request)
+        email.domain?(Config.domain || request.domain)
+      end
+
+      attr_reader :adapter
     end
 
-    #
-    # Return true if the user address is for a user of this service provider.
-    # e.g. if the provider is example.org, then alice@example.org returns true.
-    #
-    # If 'domain' is not configured, we rely on the Host header of the HTTP request.
-    #
-    def local_address?(email, request)
-      email.domain?(Config.domain || request.domain)
+    class FingerprintHandler
+
+      def initialize(adapter)
+        @adapter = adapter
+      end
+
+      def call(request)
+        fingerprint = request.fingerprint
+        if fingerprint.length == 40 && !fingerprint[/\H/]
+          source = Nickserver::Hkp::Source.new(adapter)
+          source.get_key_by_fingerprint(fingerprint)
+        else
+          ErrorResponse.new('Fingerprint invalid: ' + fingerprint)
+        end
+      end
+
+      protected
+
+      attr_reader :adapter
     end
 
-    def send_error(msg = "not supported")
-      send_response 500, "500 #{msg}\n"
-    end
-
-    def send_not_found(msg = "Not Found")
-      send_response 404, "404 #{msg}\n"
+    class ErrorResponse < Nickserver::Response
+      def initialize(message)
+        @status = 500
+        @message = message + "\n"
+      end
     end
 
     def send_response(status = 200, content = '')
