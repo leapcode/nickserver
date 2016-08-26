@@ -6,7 +6,9 @@ require 'http'
 
 module Nickserver::Adapters
   class CelluloidHttp
-    include Celluloid::IO
+    silence_warnings do
+      include Celluloid::IO
+    end
 
     def get(url, options = {})
       response = HTTP.get url,
