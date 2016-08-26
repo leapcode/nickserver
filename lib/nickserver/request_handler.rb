@@ -4,16 +4,46 @@ require 'nickserver/couch_db/source'
 module Nickserver
   class RequestHandler
 
+    class Request
+      def initialize(params, headers)
+        @params = params || {}
+        @headers = headers
+      end
+
+      def email
+        param("address")
+      end
+
+      def fingerprint
+        param("fingerprint")
+      end
+
+      def domain
+        host_header = headers['Host']
+        raise MissingHostHeader if host_header.nil?
+        host_header.split(':')[0].strip.sub(/^nicknym\./, '')
+      end
+
+      protected
+
+      def param(key)
+        params[key] && params[key].first
+      end
+
+      attr_reader :params, :headers
+    end
+
     def initialize(responder, adapter)
       @responder = responder
       @adapter = adapter
     end
 
     def respond_to(params, headers)
-      if params && params["address"] && params["address"].any?
-        by_email(params, headers)
-      elsif params && params["fingerprint"] && params["fingerprint"].any?
-        by_fingerprint(params)
+      request = Request.new params, headers
+      if request.email
+        by_email(request)
+      elsif request.fingerprint
+        by_fingerprint(request)
       else
         send_not_found
       end
@@ -26,17 +56,17 @@ module Nickserver
 
     protected
 
-    def by_email(params, headers)
-      email = EmailAddress.new(params["address"].first)
+    def by_email(request)
+      email = EmailAddress.new(request.email)
       if email.invalid?
         send_error("Not a valid address")
       else
-        send_key(email, headers)
+        send_key(email, request)
       end
     end
 
-    def by_fingerprint(params)
-      fingerprint = params["fingerprint"].first
+    def by_fingerprint(request)
+      fingerprint = request.fingerprint
       if fingerprint.length == 40 && !fingerprint[/\H/]
         source = Nickserver::Hkp::Source.new(adapter)
         key_response = source.get_key_by_fingerprint(fingerprint)
@@ -46,8 +76,8 @@ module Nickserver
       end
     end
 
-    def send_key(email, headers)
-      if local_address?(email, headers)
+    def send_key(email, request)
+      if local_address?(email, request)
         source = Nickserver::CouchDB::Source.new(adapter)
       else
         source = Nickserver::Hkp::Source.new(adapter)
@@ -64,15 +94,8 @@ module Nickserver
     #
     # If 'domain' is not configured, we rely on the Host header of the HTTP request.
     #
-    def local_address?(email, headers)
-      email.domain?(Config.domain || domain_from_headers(headers))
-    end
-
-    # no domain configured, use Host header
-    def domain_from_headers(headers)
-      host_header = headers['Host']
-      raise MissingHostHeader if host_header.nil?
-      host_header.split(':')[0].strip.sub(/^nicknym\./, '')
+    def local_address?(email, request)
+      email.domain?(Config.domain || request.domain)
     end
 
     def send_error(msg = "not supported")
