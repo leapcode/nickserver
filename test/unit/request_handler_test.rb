@@ -25,7 +25,7 @@ class Nickserver::RequestHandlerTest < Minitest::Test
     Nickserver::Hkp::Source.stub :new, source do
       assert_response status: 200, content: "200 fake content"
     end
-   end
+  end
 
   def test_fingerprint_to_short
     handle fingerprint: ['44F2F455E28']
