@@ -63,14 +63,11 @@ class Nickserver::RequestHandlerTest < Minitest::Test
   end
 
   def handler
-    Nickserver::RequestHandler.new responder, adapter
+    Nickserver::RequestHandler.new responder
   end
 
   def responder
     @responder ||= Minitest::Mock.new
   end
 
-  def adapter
-    @adapter ||= Minitest::Mock.new
-  end
 end

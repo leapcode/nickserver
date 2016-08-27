@@ -1,13 +1,12 @@
 module Nickserver
   class Source
 
-    def initialize(adapter)
+    def initialize(adapter = Nickserver::Adapters::CelluloidHttp.new)
       @adapter = adapter
     end
 
     protected
 
     attr_reader :adapter
-
   end
 end

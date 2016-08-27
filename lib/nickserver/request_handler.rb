@@ -33,9 +33,8 @@ module Nickserver
       attr_reader :params, :headers
     end
 
-    def initialize(responder, adapter)
+    def initialize(responder)
       @responder = responder
-      @adapter = adapter
     end
 
     def respond_to(params, headers)
@@ -57,19 +56,15 @@ module Nickserver
 
     def handler_for_request(request)
       if request.email
-        EmailHandler.new adapter
+        EmailHandler.new
       elsif request.fingerprint
-        FingerprintHandler.new adapter
+        FingerprintHandler.new
       else
         Proc.new { Nickserver::Response.new(404, "Not Found\n") }
       end
     end
 
     class EmailHandler
-
-      def initialize(adapter)
-        @adapter = adapter
-      end
 
       def call(request)
         email = EmailAddress.new(request.email)
@@ -84,9 +79,9 @@ module Nickserver
 
       def send_key(email, request)
         if local_address?(email, request)
-          source = Nickserver::CouchDB::Source.new(adapter)
+          source = Nickserver::CouchDB::Source.new
         else
-          source = Nickserver::Hkp::Source.new(adapter)
+          source = Nickserver::Hkp::Source.new
         end
         source.query(email)
       rescue MissingHostHeader
@@ -102,29 +97,20 @@ module Nickserver
       def local_address?(email, request)
         email.domain?(Config.domain || request.domain)
       end
-
-      attr_reader :adapter
     end
 
     class FingerprintHandler
 
-      def initialize(adapter)
-        @adapter = adapter
-      end
-
       def call(request)
         fingerprint = request.fingerprint
         if fingerprint.length == 40 && !fingerprint[/\H/]
-          source = Nickserver::Hkp::Source.new(adapter)
+          source = Nickserver::Hkp::Source.new
           source.get_key_by_fingerprint(fingerprint)
         else
           ErrorResponse.new('Fingerprint invalid: ' + fingerprint)
         end
       end
 
-      protected
-
-      attr_reader :adapter
     end
 
     class ErrorResponse < Nickserver::Response
@@ -138,7 +124,7 @@ module Nickserver
       responder.respond status, content
     end
 
-    attr_reader :responder, :adapter
+    attr_reader :responder
 
     class MissingHostHeader < StandardError
     end

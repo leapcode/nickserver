@@ -32,7 +32,7 @@ module Nickserver
     protected
 
     def handler_for(request)
-      RequestHandler.new(request, Nickserver::Adapters::CelluloidHttp.new)
+      RequestHandler.new(request)
     end
 
     def params(request)
