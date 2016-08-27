@@ -1,44 +1,16 @@
 require 'nickserver/hkp/source'
 require 'nickserver/couch_db/source'
+require 'nickserver/request'
 
 module Nickserver
   class RequestHandler
-
-    class Request
-      def initialize(params, headers)
-        @params = params || {}
-        @headers = headers
-      end
-
-      def email
-        param("address")
-      end
-
-      def fingerprint
-        param("fingerprint")
-      end
-
-      def domain
-        host_header = headers['Host']
-        raise MissingHostHeader if host_header.nil?
-        host_header.split(':')[0].strip.sub(/^nicknym\./, '')
-      end
-
-      protected
-
-      def param(key)
-        params[key] && params[key].first
-      end
-
-      attr_reader :params, :headers
-    end
 
     def initialize(responder)
       @responder = responder
     end
 
     def respond_to(params, headers)
-      request = Request.new params, headers
+      request = Nickserver::Request.new params, headers
       response = handle request
       send_response response.status, response.content
     end
@@ -95,7 +67,9 @@ module Nickserver
       # If 'domain' is not configured, we rely on the Host header of the HTTP request.
       #
       def local_address?(email, request)
-        email.domain?(Config.domain || request.domain)
+        domain = Config.domain || request.domain
+        raise MissingHostHeader if domain == ''
+        email.domain? domain
       end
     end
 
