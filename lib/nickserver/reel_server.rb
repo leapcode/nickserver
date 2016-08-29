@@ -2,7 +2,7 @@ silence_warnings do
   require 'reel'
 end
 require 'nickserver/adapters/celluloid_http'
-require 'nickserver/request_handler'
+require 'nickserver/dispatcher'
 
 module Nickserver
   class ReelServer < Reel::Server::HTTP
@@ -32,7 +32,7 @@ module Nickserver
     protected
 
     def handler_for(request)
-      RequestHandler.new(request)
+      Dispatcher.new(request)
     end
 
     def params(request)
