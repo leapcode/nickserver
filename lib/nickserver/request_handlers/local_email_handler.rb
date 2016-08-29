@@ -9,7 +9,6 @@ module Nickserver
       def call(request)
         return nil unless request.email
         domain = Config.domain || request.domain
-        return missing_domain_response if domain.nil? || domain == ''
         email = EmailAddress.new(request.email)
         return nil unless email.domain?(domain)
         source.query email
@@ -17,14 +16,8 @@ module Nickserver
 
       protected
 
-      attr_reader :domain
-
       def source
         Nickserver::CouchDB::Source.new
-      end
-
-      def missing_domain_response
-        ErrorResponse.new "HTTP request must include a Host header."
       end
 
     end

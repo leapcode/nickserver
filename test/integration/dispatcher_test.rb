@@ -15,16 +15,12 @@ class Nickserver::DispatcherTest < Minitest::Test
 
   def test_missing_domain
     handle address: ['valid@email.tld']
-    assert_response status: 500, content: "500 HTTP request must include a Host header.\n"
+    assert_response_from_hkp
   end
 
   def test_email_from_hkp
     handle address: ['valid@email.tld'], headers: { "Host" => "http://nickserver.me" }
-    source = Minitest::Mock.new
-    source.expect :query, Nickserver::Response.new(200, "fake content"), [Nickserver::EmailAddress]
-    Nickserver::Hkp::Source.stub :new, source do
-      assert_response status: 200, content: "200 fake content"
-    end
+    assert_response_from_hkp
   end
 
   def test_fingerprint_to_short
@@ -60,6 +56,14 @@ class Nickserver::DispatcherTest < Minitest::Test
     responder.expect :respond, nil, [args[:status], args[:content]]
     dispatcher.respond_to @params, @headers
     responder.verify
+  end
+
+  def assert_response_from_hkp
+    source = Minitest::Mock.new
+    source.expect :query, Nickserver::Response.new(200, "fake content"), [Nickserver::EmailAddress]
+    Nickserver::Hkp::Source.stub :new, source do
+      assert_response status: 200, content: "200 fake content"
+    end
   end
 
   def dispatcher
