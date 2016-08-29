@@ -1,20 +1,13 @@
 require 'nickserver/email_address'
-require 'nickserver/hkp/source'
+require 'nickserver/error_response'
 
 module Nickserver
   module RequestHandlers
-    class EmailHandler
-
+    class InvalidEmailHandler
       def call(request)
         return unless request.email
         email = EmailAddress.new(request.email)
-        source.query(email)
-      end
-
-      protected
-
-      def source
-        Nickserver::Hkp::Source.new
+        ErrorResponse.new("Not a valid address") if email.invalid?
       end
 
     end

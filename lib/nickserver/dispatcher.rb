@@ -14,6 +14,8 @@
 #
 
 require 'nickserver/request'
+require 'nickserver/request_handlers/invalid_email_handler'
+require 'nickserver/request_handlers/local_email_handler'
 require 'nickserver/request_handlers/email_handler'
 require 'nickserver/request_handlers/fingerprint_handler'
 
@@ -45,6 +47,8 @@ module Nickserver
 
     def handler_chain
       [
+        RequestHandlers::InvalidEmailHandler.new,
+        RequestHandlers::LocalEmailHandler.new,
         RequestHandlers::EmailHandler.new,
         RequestHandlers::FingerprintHandler.new,
         Proc.new { Nickserver::Response.new(404, "Not Found\n") }
