@@ -1,3 +1,18 @@
+#
+# Dispatcher
+#
+# Dispatch a request so it get's handled by the correct handler.
+#
+# The dispatcher hands a request to one handler after the other until one of
+# them responds.
+#
+# This is similar to the Chain of Responsibility patter but we iterate over the
+# 'handler_chain' array instead of a linked list.
+#
+# To change the order of handlers or add other handlers change the array in the
+# handler_chain function.
+#
+
 require 'nickserver/request'
 require 'nickserver/request_handlers/email_handler'
 require 'nickserver/request_handlers/fingerprint_handler'
@@ -18,22 +33,22 @@ module Nickserver
     protected
 
     def handle(request)
-      handler = handler_for_request request
-      handler.call request
+      handler_chain.each do |handler|
+        response = handler.call request
+        return response if response
+      end
     rescue RuntimeError => exc
       puts "Error: #{exc}"
       puts exc.backtrace
       ErrorResponse.new(exc.to_s)
     end
 
-    def handler_for_request(request)
-      if request.email
-        RequestHandlers::EmailHandler.new
-      elsif request.fingerprint
-        RequestHandlers::FingerprintHandler.new
-      else
+    def handler_chain
+      [
+        RequestHandlers::EmailHandler.new,
+        RequestHandlers::FingerprintHandler.new,
         Proc.new { Nickserver::Response.new(404, "Not Found\n") }
-      end
+      ]
     end
 
     def send_response(status = 200, content = '')

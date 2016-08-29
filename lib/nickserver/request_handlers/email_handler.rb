@@ -8,6 +8,13 @@ module Nickserver
     class EmailHandler
 
       def call(request)
+        return unless request.email
+        handle_request(request)
+      end
+
+      protected
+
+      def handle_request(request)
         email = EmailAddress.new(request.email)
         if email.invalid?
           ErrorResponse.new("Not a valid address")
@@ -15,8 +22,6 @@ module Nickserver
           send_key(email, request)
         end
       end
-
-      protected
 
       def send_key(email, request)
         if local_address?(email, request)
