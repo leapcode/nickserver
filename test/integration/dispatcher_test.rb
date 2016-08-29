@@ -1,7 +1,7 @@
 require 'test_helper'
-require 'nickserver/request_handler'
+require 'nickserver/dispatcher'
 
-class Nickserver::RequestHandlerTest < Minitest::Test
+class Nickserver::DispatcherTest < Minitest::Test
 
   def test_empty_query
     handle
@@ -58,19 +58,16 @@ class Nickserver::RequestHandlerTest < Minitest::Test
 
   def assert_response(args)
     responder.expect :respond, nil, [args[:status], args[:content]]
-    handler.respond_to @params, @headers
+    dispatcher.respond_to @params, @headers
     responder.verify
   end
 
-  def handler
-    Nickserver::RequestHandler.new responder, adapter
+  def dispatcher
+    Nickserver::Dispatcher.new responder
   end
 
   def responder
     @responder ||= Minitest::Mock.new
   end
 
-  def adapter
-    @adapter ||= Minitest::Mock.new
-  end
 end
