@@ -1,20 +1,24 @@
+require 'nickserver/request_handlers/base'
 require 'nickserver/email_address'
-require 'nickserver/error_response'
 require 'nickserver/couch_db/source'
 
 module Nickserver
   module RequestHandlers
-    class LocalEmailHandler
+    class LocalEmailHandler < Base
 
-      def call(request)
-        return nil unless request.email
-        domain = Config.domain || request.domain
-        email = EmailAddress.new(request.email)
-        return nil unless email.domain?(domain)
-        source.query email
+      def handle
+        source.query(email) if request.email && email.domain?(domain)
       end
 
       protected
+
+      def domain
+        Config.domain || request.domain
+      end
+
+      def email
+        @email ||= EmailAddress.new(request.email)
+      end
 
       def source
         Nickserver::CouchDB::Source.new

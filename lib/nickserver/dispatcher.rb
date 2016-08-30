@@ -47,10 +47,10 @@ module Nickserver
 
     def handler_chain
       [
-        RequestHandlers::InvalidEmailHandler.new,
-        RequestHandlers::LocalEmailHandler.new,
-        RequestHandlers::HkpEmailHandler.new,
-        RequestHandlers::FingerprintHandler.new,
+        RequestHandlers::InvalidEmailHandler,
+        RequestHandlers::LocalEmailHandler,
+        RequestHandlers::HkpEmailHandler,
+        RequestHandlers::FingerprintHandler,
         Proc.new { Nickserver::Response.new(404, "Not Found\n") }
       ]
     end

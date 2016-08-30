@@ -3,15 +3,17 @@ require 'nickserver/hkp/source'
 
 module Nickserver
   module RequestHandlers
-    class HkpEmailHandler
+    class HkpEmailHandler < Base
 
-      def call(request)
-        return unless request.email
-        email = EmailAddress.new(request.email)
-        source.query(email)
+      def handle
+        source.query(email) if request.email
       end
 
       protected
+
+      def email
+        @email ||= EmailAddress.new(request.email)
+      end
 
       def source
         Nickserver::Hkp::Source.new

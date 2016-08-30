@@ -26,7 +26,7 @@ class LocalEmailHandlerTest < MiniTest::Test
   protected
 
   def handler
-    Nickserver::RequestHandlers::LocalEmailHandler.new
+    Nickserver::RequestHandlers::LocalEmailHandler
   end
 
   def source_class

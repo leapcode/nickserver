@@ -1,25 +1,28 @@
+require 'nickserver/request_handlers/base'
 require 'nickserver/hkp/source'
 require 'nickserver/error_response'
 
 module Nickserver
   module RequestHandlers
-    class FingerprintHandler
+    class FingerprintHandler < Base
 
-      def call(request)
-        return unless request.fingerprint
-        handle_request(request)
-      end
-
-      protected
-
-      def handle_request(request)
-        fingerprint = request.fingerprint
+      def handle
+        return unless fingerprint
         if fingerprint.length == 40 && !fingerprint[/\H/]
-          source = Nickserver::Hkp::Source.new
           source.get_key_by_fingerprint(fingerprint)
         else
           ErrorResponse.new('Fingerprint invalid: ' + fingerprint)
         end
+      end
+
+      protected
+
+      def fingerprint
+        request.fingerprint
+      end
+
+      def source
+        Nickserver::Hkp::Source.new
       end
 
     end
