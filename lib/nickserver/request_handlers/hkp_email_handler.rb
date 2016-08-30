@@ -3,7 +3,7 @@ require 'nickserver/hkp/source'
 
 module Nickserver
   module RequestHandlers
-    class EmailHandler
+    class HkpEmailHandler
 
       def call(request)
         return unless request.email
