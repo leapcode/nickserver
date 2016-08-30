@@ -15,9 +15,9 @@ module RequestHandlerTestHelper
   end
 
   def source_expecting_query_for(*query_args)
-    source = Minitest::Mock.new
-    source.expect :query, 'response', query_args
-    source
+    @source ||= Minitest::Mock.new
+    @source.expect :query, 'response', query_args
+    @source
   end
 
   def assert_responds_with_error(msg, opts)

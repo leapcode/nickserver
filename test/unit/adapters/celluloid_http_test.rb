@@ -13,7 +13,16 @@ class Nickserver::Adapters::CelluloidHttpTest < Minitest::Test
     super
   end
 
-  def test_successful_request
+  def test_request_without_query
+    url = 'http://url.to'
+    stub_http_request(:get, url)
+      .to_return status: 200, body: 'body'
+    status, body = adapter.get url
+    assert_equal 200, status
+    assert_equal 'body', body
+  end
+
+  def test_successful_request_with_query
     url = 'http://url.to'
     stub_http_request(:get, url)
       .with(query: {key: :value})

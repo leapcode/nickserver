@@ -30,7 +30,11 @@ module Nickserver
     end
 
     def domain?(domain)
-      address.end_with? "@#{domain}"
+      domain == self.domain
+    end
+
+    def domain
+      address.split('@')[1]
     end
 
     def to_s
