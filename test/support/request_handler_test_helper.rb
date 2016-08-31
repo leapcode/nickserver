@@ -1,3 +1,5 @@
+require 'nickserver/request'
+
 module RequestHandlerTestHelper
 
   protected

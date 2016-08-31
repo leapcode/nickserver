@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'nickserver/server'
 require 'json'
 
 #

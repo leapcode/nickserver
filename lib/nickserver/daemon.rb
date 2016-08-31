@@ -1,3 +1,6 @@
+require "nickserver/version"
+require "nickserver/config"
+
 require 'etc'
 require 'fileutils'
 

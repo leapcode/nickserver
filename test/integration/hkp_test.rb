@@ -1,6 +1,5 @@
 require 'test_helper'
 require 'nickserver/hkp/source'
-require 'nickserver/adapters/celluloid_http'
 
 class HkpTest < Minitest::Test
 

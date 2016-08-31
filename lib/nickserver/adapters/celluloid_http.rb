@@ -1,4 +1,5 @@
 require 'nickserver/adapters'
+require 'nickserver/config'
 silence_warnings do
   require 'celluloid/io'
 end

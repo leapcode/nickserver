@@ -1,3 +1,5 @@
+require 'nickserver/adapters/celluloid_http'
+
 module Nickserver
   class Source
 

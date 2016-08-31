@@ -8,9 +8,10 @@ silence_warnings do
   require 'webmock/minitest'
 end
 require 'celluloid/test'
-require 'nickserver'
 require 'minitest/pride'
 require 'minitest/hell'
+
+require 'nickserver/config'
 
 TESTING = true
 

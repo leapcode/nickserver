@@ -1,3 +1,4 @@
+require 'nickserver/request_handlers/base'
 require 'nickserver/email_address'
 require 'nickserver/nicknym/source'
 

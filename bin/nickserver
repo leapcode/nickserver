@@ -17,7 +17,8 @@ def load_local_gem(dir_path='../..')
 end
 
 load_local_gem
-require 'nickserver'
+require 'nickserver/daemon'
+require 'nickserver/server'
 
 Nickserver::Daemon.run('nickserver') do
   Nickserver::Server.start
