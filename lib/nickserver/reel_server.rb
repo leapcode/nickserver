@@ -32,6 +32,7 @@ module Nickserver
     protected
 
     def handler_for(request)
+      # with reel the request is the responder
       Dispatcher.new(request)
     end
 

@@ -1,21 +1,20 @@
 require 'test_helper'
+require 'support/http_stub_helper'
 require 'nickserver/server'
 require 'json'
 
 #
 # Some important notes to understanding these tests:
 #
-# (1) Requests to 127.0.0.1 always bypass HTTP stub.
+# (1) We mock the http adapter. So no network is required.
 #
-# (2) All requests to nickserver are to 127.0.0.1.
+# (2) We actually start the nickserver on 127.0.0.1 and talk to it via http.
 #
 # (3) the "Host" header for requests to nickserver must be set (or Config.domain set)
 #
-# (4) When stubbing requests to couchdb, the couchdb host is changed from the
-# default (127.0.0.1) to a dummy value (notlocalhost).
-#
 
 class NickserverTest < Minitest::Test
+  include HttpStubHelper
 
   def setup
     super
@@ -107,7 +106,9 @@ class NickserverTest < Minitest::Test
   #
   def start(timeout = 1)
     server = Nickserver::ReelServer.new '127.0.0.1', config.port
-    yield server
+    stubbing_http do
+      yield server
+    end
   ensure
     server.terminate if server && server.alive?
   end

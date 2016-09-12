@@ -19,7 +19,7 @@ module Nickserver
 
       def get(*args)
         args[0] = "https://#{args.first}"
-        adapter.get *args
+        adapter.get(*args)
       end
     end
   end

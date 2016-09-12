@@ -14,9 +14,7 @@ class RemoteNicknymSourceTest < Minitest::Test
   end
 
   def test_truth
-    real_network do
-      assert source.available_for? 'mail.bitmask.net'
-    end
+    assert source.available_for? 'mail.bitmask.net'
   end
 
   protected
