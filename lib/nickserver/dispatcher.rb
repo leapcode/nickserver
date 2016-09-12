@@ -29,7 +29,7 @@ module Nickserver
     def respond_to(params, headers)
       request = Nickserver::Request.new params, headers
       response = handle request
-      send_response response.status, response.content
+      send_response response
     end
 
     protected
@@ -51,12 +51,12 @@ module Nickserver
         RequestHandlers::LocalEmailHandler,
         RequestHandlers::HkpEmailHandler,
         RequestHandlers::FingerprintHandler,
-        Proc.new { Nickserver::Response.new(404, "Not Found\n") }
+        Proc.new { Nickserver::Response.new(404, "404 Not Found\n") }
       ]
     end
 
-    def send_response(status = 200, content = '')
-      responder.respond status, content
+    def send_response(response)
+      responder.respond response.status, response.content
     end
 
     attr_reader :responder

@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'nickserver/nicknym/source'
+require 'nickserver/email_address'
 
 class NicknymSourceTest < Minitest::Test
 
@@ -21,6 +22,15 @@ class NicknymSourceTest < Minitest::Test
     adapter.verify
   end
 
+  def test_successful_query
+    adapter.expect :get, [200, 'dummy body'],
+      ['https://nicknym.leap_powered.tld', address: email_stub.to_s]
+    response = source.query(email_stub)
+    assert_equal 200, response.status
+    assert_equal 'dummy body', response.content
+    adapter.verify
+  end
+
   protected
 
   def source
@@ -29,5 +39,9 @@ class NicknymSourceTest < Minitest::Test
 
   def adapter
     @adapter ||= Minitest::Mock.new
+  end
+
+  def email_stub
+    @email_stub ||= Nickserver::EmailAddress.new 'test@leap_powered.tld'
   end
 end

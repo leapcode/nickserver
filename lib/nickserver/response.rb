@@ -1,15 +1,15 @@
 module Nickserver
   class Response
 
-    attr_reader :status, :message
+    attr_reader :status, :body
 
-    def initialize(status, message)
+    def initialize(status, body)
       @status = status
-      @message = message
+      @body = body
     end
 
     def content
-      "#{status} #{message}"
+      body
     end
   end
 end

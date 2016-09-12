@@ -38,10 +38,10 @@ class Nickserver::DispatcherTest < Minitest::Test
     handle fingerprint: ['E36E738D69173C13D709E44F2F455E2824D18DDF']
     source = Minitest::Mock.new
     source.expect :get_key_by_fingerprint,
-      Nickserver::Response.new(200, "fake fingerprint"),
+      Nickserver::Response.new(200, "fake key response"),
       ['E36E738D69173C13D709E44F2F455E2824D18DDF']
     Nickserver::Hkp::Source.stub :new, source do
-      assert_response status: 200, content: "200 fake fingerprint"
+      assert_response status: 200, content: "fake key response"
     end
   end
 
@@ -62,7 +62,7 @@ class Nickserver::DispatcherTest < Minitest::Test
     source = Minitest::Mock.new
     source.expect :query, Nickserver::Response.new(200, "fake content"), [Nickserver::EmailAddress]
     Nickserver::Hkp::Source.stub :new, source do
-      assert_response status: 200, content: "200 fake content"
+      assert_response status: 200, content: "fake content"
     end
   end
 

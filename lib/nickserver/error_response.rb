@@ -7,5 +7,12 @@ module Nickserver
       @message = message + "\n"
     end
 
+    def content
+      "#{status} #{message}"
+    end
+
+    protected
+
+    attr_reader :message
   end
 end
