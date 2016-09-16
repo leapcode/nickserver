@@ -8,31 +8,55 @@ class NicknymSourceTest < Minitest::Test
     assert source
   end
 
-  def test_available_for_domain
-    adapter.expect :get, [200, '{"services": ["mx"]}'],
-      ['https://leap_powered.tld/provider.json']
-    assert source.available_for?('leap_powered.tld')
-    adapter.verify
+  def test_available_for_domain_with_service_mx
+    assert available_on?(200, '{"services": ["mx"]}')
   end
 
-  def test_not_available_for_domain
-    adapter.expect :get, [404, nil],
-      ['https://remote.tld/provider.json']
-    assert !source.available_for?('remote.tld')
-    adapter.verify
+  def test_no_provider_json_means_no_nicknym
+    refute available_on?(404, 'blablabla')
   end
 
-  def test_successful_query
-    adapter.expect :get, [200, 'dummy body'],
-      ['https://nicknym.leap_powered.tld:6425',
-       {query: {address: email_stub.to_s}}]
-    response = source.query(email_stub)
-    assert_equal 200, response.status
-    assert_equal 'dummy body', response.content
-    adapter.verify
+  def test_invalid_provider_json_means_no_nicknym
+    refute available_on?(200, 'blablabla')
+  end
+
+  def test_failing_network_means_no_nicknym
+    failing_network
+    refute source.available_for?('remote.tld')
+  end
+
+  def test_proxy_successful_query
+    assert proxies_query_response?(200, 'dummy body')
+  end
+
+  def test_proxy_query_not_found
+    assert proxies_query_response?(404, 'dummy body')
   end
 
   protected
+
+  def proxies_query_response?(status = 0, body = nil)
+    adapter.expect :get, [status, body],
+      ['https://nicknym.leap_powered.tld:6425', query: {address: email_stub.to_s}]
+    response = source.query(email_stub)
+    assert_equal status, response.status
+    assert_equal body, response.content
+    adapter.verify
+  end
+
+  def available_on?(status = 0, body = nil)
+    adapter.expect :get, [status, body],
+      ['https://remote.tld/provider.json']
+    available = source.available_for?('remote.tld')
+    adapter.verify
+    return available
+  end
+
+  def failing_network
+    def adapter.get(*args)
+      raise HTTP::ConnectionError
+    end
+  end
 
   def source
     Nickserver::Nicknym::Source.new(adapter)

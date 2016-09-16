@@ -8,6 +8,8 @@ module Nickserver
       def available_for?(domain)
         status, body = adapter.get "https://#{domain}/provider.json"
         status == 200 && provider_with_mx?(body)
+      rescue HTTP::ConnectionError
+        return false
       end
 
       def query(email)
