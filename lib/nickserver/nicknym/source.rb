@@ -6,20 +6,28 @@ module Nickserver
     class Source < Nickserver::Source
 
       def available_for?(domain)
-        status, _body = get "#{domain}/provider.json"
-        status == 200
+        status, body = adapter.get "https://#{domain}/provider.json"
+        status == 200 && provider_with_mx?(body)
       end
 
       def query(email)
-        status, body = get "nicknym.#{email.domain}", address: email.to_s
+        status, body = nicknym_get email.domain, address: email.to_s
         return Nickserver::Response.new(status, body)
       end
 
       protected
 
-      def get(*args)
-        args[0] = "https://#{args.first}"
-        adapter.get(*args)
+      def nicknym_get(domain, query = {})
+        url = "https://nicknym.#{domain}:#{Config.port}"
+        adapter.get(url, query: query)
+      end
+
+      def provider_with_mx?(provider_json)
+        provider = JSON.parse provider_json
+        services = provider['services'] || []
+        services.include?('mx')
+      rescue JSON::ParserError
+        return false
       end
     end
   end
