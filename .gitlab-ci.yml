@@ -21,6 +21,7 @@ before_script:
   - curl -s couchdb:5984
   - gem install bundler  --no-ri --no-rdoc
   - bundle install -j $(nproc) --path vendor
+  - bundle exec ruby /builds/leap/nickserver/bin/nickserver version
 
 test:
   script:
