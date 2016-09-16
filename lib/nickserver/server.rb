@@ -1,8 +1,8 @@
-require 'nickserver/config'
-require 'nickserver/reel_server'
-
 require 'kernel_ext'
 require 'json'
+
+require 'nickserver/config'
+require 'nickserver/reel_server'
 
 #
 # This is the main HTTP server that clients connect to in order to fetch keys
