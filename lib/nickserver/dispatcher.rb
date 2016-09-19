@@ -35,10 +35,7 @@ module Nickserver
     protected
 
     def handle(request)
-      handler_chain.each do |handler|
-        response = handler.call request
-        return response if response
-      end
+      handler_chain.handle request
     rescue RuntimeError => exc
       puts "Error: #{exc}"
       puts exc.backtrace
@@ -46,13 +43,11 @@ module Nickserver
     end
 
     def handler_chain
-      [
-        RequestHandlers::InvalidEmailHandler,
+      HandlerChain.new RequestHandlers::InvalidEmailHandler,
         RequestHandlers::LocalEmailHandler,
         RequestHandlers::HkpEmailHandler,
         RequestHandlers::FingerprintHandler,
         Proc.new { Nickserver::Response.new(404, "404 Not Found\n") }
-      ]
     end
 
     def send_response(response)
