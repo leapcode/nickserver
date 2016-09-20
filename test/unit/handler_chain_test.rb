@@ -23,6 +23,26 @@ class HandlerChainTest < Minitest::Test
     assert_equal :result, chain.handle
   end
 
+  def test_raise_exception
+    chain handler_raising, handler_with_result
+    assert_raises RuntimeError do
+      chain.handle
+    end
+  end
+
+  def test_continue_on_exception
+    chain handler_raising, handler_with_result
+    chain.continue_on(RuntimeError)
+    assert_equal :result, chain.handle
+    assert_equal [RuntimeError], chain.rescued_exceptions.map(&:class)
+  end
+
+  def test_continue_on_exception_with_nil
+    chain handler_raising, handler_with_nil
+    chain.continue_on(RuntimeError)
+    assert_nil chain.handle
+    assert_equal [RuntimeError], chain.rescued_exceptions.map(&:class)
+  end
 
   protected
 
@@ -42,4 +62,7 @@ class HandlerChainTest < Minitest::Test
     Proc.new { :result }
   end
 
+  def handler_raising(exception = RuntimeError)
+    Proc.new { raise exception }
+  end
 end
