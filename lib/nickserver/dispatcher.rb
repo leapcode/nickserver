@@ -14,8 +14,10 @@
 #
 
 require 'nickserver/request'
+require 'nickserver/handler_chain'
 require 'nickserver/request_handlers/invalid_email_handler'
 require 'nickserver/request_handlers/local_email_handler'
+require 'nickserver/request_handlers/leap_email_handler'
 require 'nickserver/request_handlers/hkp_email_handler'
 require 'nickserver/request_handlers/fingerprint_handler'
 
@@ -45,6 +47,7 @@ module Nickserver
     def handler_chain
       HandlerChain.new RequestHandlers::InvalidEmailHandler,
         RequestHandlers::LocalEmailHandler,
+        RequestHandlers::LeapEmailHandler,
         RequestHandlers::HkpEmailHandler,
         RequestHandlers::FingerprintHandler,
         Proc.new { Nickserver::Response.new(404, "404 Not Found\n") }

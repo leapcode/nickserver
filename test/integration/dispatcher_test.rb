@@ -5,44 +5,51 @@ class Nickserver::DispatcherTest < Minitest::Test
 
   def test_empty_query
     handle
-    assert_response status: 404, content: "404 Not Found\n"
+    assert_response not_found
   end
 
   def test_invalid_query
     handle address: ['asdf']
-    assert_response status: 500, content: "500 Not a valid address\n"
-  end
-
-  def test_missing_domain
-    handle address: ['valid@email.tld']
-    assert_response_from_hkp
-  end
-
-  def test_email_from_hkp
-    handle address: ['valid@email.tld'], headers: { "Host" => "http://nickserver.me" }
-    assert_response_from_hkp
+    assert_response error('Not a valid address')
   end
 
   def test_fingerprint_to_short
     handle fingerprint: ['44F2F455E28']
-    assert_response status: 500, content: "500 Fingerprint invalid: 44F2F455E28\n"
+    assert_response error("Fingerprint invalid: 44F2F455E28")
   end
 
   def test_fingerprint_is_not_hex
     handle fingerprint: ['X36E738D69173C13Z709E44F2F455E2824D18DDX']
-    assert_response status: 500,
-      content: "500 Fingerprint invalid: X36E738D69173C13Z709E44F2F455E2824D18DDX\n"
+    assert_response error("Fingerprint invalid: X36E738D69173C13Z709E44F2F455E2824D18DDX")
   end
 
-  def test_get_key_with_fingerprint_from_hkp
+  def test_missing_domain
+    handle address: ['valid@email.tld']
+    stub_nicknym_not_available
+    hkp_source.expect :query, success, [Nickserver::EmailAddress]
+    assert_response success
+  end
+
+  def test_email_via_hkp
+    handle address: ['valid@email.tld'], headers: { "Host" => "http://nickserver.me" }
+    stub_nicknym_not_available
+    hkp_source.expect :query, success, [Nickserver::EmailAddress]
+    assert_response success
+  end
+
+  def test_email_via_nicknym
+    handle address: ['valid@email.tld'], headers: { "Host" => "http://nickserver.me" }
+    nicknym_source.expect :available_for?, true, [String]
+    nicknym_source.expect :query, success, [Nickserver::EmailAddress]
+    assert_response success
+  end
+
+  def test_get_key_with_fingerprint
     handle fingerprint: ['E36E738D69173C13D709E44F2F455E2824D18DDF']
-    source = Minitest::Mock.new
-    source.expect :get_key_by_fingerprint,
-      Nickserver::Response.new(200, "fake key response"),
+    stub_nicknym_not_available
+    hkp_source.expect :get_key_by_fingerprint, success,
       ['E36E738D69173C13D709E44F2F455E2824D18DDF']
-    Nickserver::Hkp::Source.stub :new, source do
-      assert_response status: 200, content: "fake key response"
-    end
+    assert_response success
   end
 
   protected
@@ -52,18 +59,44 @@ class Nickserver::DispatcherTest < Minitest::Test
     @params = Hash[ params.map{ |k,v| [k.to_s, v] } ]
   end
 
-  def assert_response(args)
-    responder.expect :respond, nil, [args[:status], args[:content]]
-    dispatcher.respond_to @params, @headers
-    responder.verify
+  def assert_response(response)
+    Nickserver::Nicknym::Source.stub :new, nicknym_source do
+      Nickserver::Hkp::Source.stub :new, hkp_source do
+        responder.expect :respond, nil, [response.status, response.content]
+        dispatcher.respond_to @params, @headers
+        responder.verify
+      end
+    end
   end
 
-  def assert_response_from_hkp
-    source = Minitest::Mock.new
-    source.expect :query, Nickserver::Response.new(200, "fake content"), [Nickserver::EmailAddress]
-    Nickserver::Hkp::Source.stub :new, source do
-      assert_response status: 200, content: "fake content"
+  def hkp_source
+    @hkp_source ||= Minitest::Mock.new
+  end
+
+  def stub_nicknym_not_available
+    def nicknym_source.available_for?(*_args)
+      false
     end
+  end
+
+  def nicknym_source
+    @nicknym_source ||= Minitest::Mock.new
+  end
+
+  def success
+    response status: 200, content: "fake content"
+  end
+
+  def not_found
+    response status: 404, content: "404 Not Found\n"
+  end
+
+  def error(msg)
+    response status: 500, content: "500 #{msg}\n"
+  end
+
+  def response(options)
+    Nickserver::Response.new(options[:status], options[:content])
   end
 
   def dispatcher
