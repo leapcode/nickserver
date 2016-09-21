@@ -3,6 +3,13 @@ require 'support/http_stub_helper'
 require 'nickserver/server'
 require 'json'
 
+# Integration Test for the whole nickserver without network dependecy.
+#
+# These tests are meant to test the integration between the different
+# components of the nickserver from the ReelServer all the way down to
+# the different sources.
+# These tests do not test the low level network adapter, the daemonization
+# or the startup script.
 #
 # Some important notes to understanding these tests:
 #

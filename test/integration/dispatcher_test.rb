@@ -1,6 +1,17 @@
 require 'test_helper'
 require 'nickserver/dispatcher'
 
+#
+# Test integration between the Dispatcher and the RequestHandlers
+#
+# Starting from a given request we test the interaction between the dispatcher
+# and the different RequestHandlers. There's a lot of combinations possible
+# and we only test a couple of them to ensure the parts work together well.
+#
+# This does not test the server. We stub and mock the sources. The nickserver
+# integration test covers these as well.
+#
+
 class Nickserver::DispatcherTest < Minitest::Test
 
   def test_empty_query
