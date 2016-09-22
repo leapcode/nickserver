@@ -48,6 +48,20 @@ class Nickserver::DispatcherTest < Minitest::Test
     assert_response success
   end
 
+  def test_email_via_hkp_nicknym_unreachable
+    handle address: ['valid@email.tld'], headers: { "Host" => "http://nickserver.me" }
+    stub_nicknym_raises
+    hkp_source.expect :query, success, [Nickserver::EmailAddress]
+    assert_response success
+  end
+
+  def test_email_via_hkp_nicknym_unreachable
+    handle address: ['valid@email.tld'], headers: { "Host" => "http://nickserver.me" }
+    stub_nicknym_raises
+    hkp_source.expect :query, nil, [Nickserver::EmailAddress]
+    assert_response response(status: 502, content: "HTTP::ConnectionError")
+  end
+
   def test_email_via_nicknym
     handle address: ['valid@email.tld'], headers: { "Host" => "http://nickserver.me" }
     nicknym_source.expect :available_for?, true, [String]
@@ -87,6 +101,12 @@ class Nickserver::DispatcherTest < Minitest::Test
   def stub_nicknym_not_available
     def nicknym_source.available_for?(*_args)
       false
+    end
+  end
+
+  def stub_nicknym_raises
+    def nicknym_source.available_for?(*_args)
+      raise HTTP::ConnectionError
     end
   end
 
