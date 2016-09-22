@@ -18,8 +18,10 @@ class RemoteNicknymSourceTest < Minitest::Test
   end
 
   def test_availablility_check
-    skip unless source.available_for? 'mail.bitmask.net'
+    source.available_for? 'mail.bitmask.net'
     refute source.available_for? 'dl.bitmask.net'   # not a provider
+  rescue HTTP::ConnectionError => e
+    skip e.to_s
   end
 
   def test_successful_query
@@ -28,12 +30,16 @@ class RemoteNicknymSourceTest < Minitest::Test
     json = JSON.parse response.content
     assert_equal email_with_key.to_s, json["address"]
     refute_empty json["openpgp"]
+  rescue HTTP::ConnectionError => e
+    skip e.to_s
   end
 
   def test_not_found
     response = source.query(email_without_key)
     skip if response.status == 200
     assert response.status == 404
+  rescue HTTP::ConnectionError => e
+    skip e.to_s
   end
 
   protected

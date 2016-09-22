@@ -20,11 +20,6 @@ class NicknymSourceTest < Minitest::Test
     refute available_on?(200, 'blablabla')
   end
 
-  def test_failing_network_means_no_nicknym
-    failing_network
-    refute source.available_for?('remote.tld')
-  end
-
   def test_proxy_successful_query
     assert proxies_query_response?(200, 'dummy body')
   end
@@ -50,12 +45,6 @@ class NicknymSourceTest < Minitest::Test
     available = source.available_for?('remote.tld')
     adapter.verify
     return available
-  end
-
-  def failing_network
-    def adapter.get(*args)
-      raise HTTP::ConnectionError
-    end
   end
 
   def source
