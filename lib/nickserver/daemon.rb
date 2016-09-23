@@ -176,6 +176,7 @@ module Nickserver
         $stdout.reopen(log_path, 'a')
         $stderr.reopen $stdout
         $stdout.sync = true
+        $stderr.sync = true
       else
         # redirect to /dev/null
         $stdin.reopen '/dev/null'

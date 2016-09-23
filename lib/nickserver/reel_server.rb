@@ -23,13 +23,23 @@ module Nickserver
 
     def on_connection(connection)
       connection.each_request do |request|
-        handler = handler_for(request)
-        handler.respond_to params(request), request.headers
+        handle_request(request)
       end
     end
 
 
     protected
+
+    def handle_request(request)
+      puts "#{request.method} #{request.uri}"
+      puts "  #{params(request)}"
+      handler = handler_for(request)
+      handler.respond_to params(request), request.headers
+    rescue StandardError => e
+      puts e
+      puts e.backtrace.join "\n  "
+      request.respond 500, "{}"
+    end
 
     def handler_for(request)
       # with reel the request is the responder
