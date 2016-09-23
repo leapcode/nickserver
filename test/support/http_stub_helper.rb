@@ -7,6 +7,11 @@ module HttpStubHelper
     adapter.verify
   end
 
+  def stub_nicknym_available_response(domain, response = {})
+    stub_http_request :get, "https://#{domain}/provider.json",
+      response: response
+  end
+
   def stub_sks_vindex_reponse(uid, response = {})
     stub_http_request :get, config.hkp_url,
       query: {op: 'vindex', search: uid, exact: 'on', options: 'mr', fingerprint: 'on'},
@@ -28,8 +33,9 @@ module HttpStubHelper
 
   def stub_http_request(verb, url, options = {})
     response = {status: 200, body: ""}.merge(options.delete(:response) || {})
+    options = nil if options == {}
     adapter.expect :get, [response[:status], response[:body]],
-      [url, options]
+      [url, options].compact
   end
 
   def adapter

@@ -14,13 +14,16 @@
 #
 
 require 'nickserver/request'
+require 'nickserver/handler_chain'
 require 'nickserver/request_handlers/invalid_email_handler'
 require 'nickserver/request_handlers/local_email_handler'
+require 'nickserver/request_handlers/leap_email_handler'
 require 'nickserver/request_handlers/hkp_email_handler'
 require 'nickserver/request_handlers/fingerprint_handler'
 
 module Nickserver
   class Dispatcher
+
 
     def initialize(responder)
       @responder = responder
@@ -35,10 +38,7 @@ module Nickserver
     protected
 
     def handle(request)
-      handler_chain.each do |handler|
-        response = handler.call request
-        return response if response
-      end
+      handler_chain.handle request
     rescue RuntimeError => exc
       puts "Error: #{exc}"
       puts exc.backtrace
@@ -46,13 +46,26 @@ module Nickserver
     end
 
     def handler_chain
-      [
-        RequestHandlers::InvalidEmailHandler,
+      @handler_chain ||= init_handler_chain
+    end
+
+    def init_handler_chain
+      chain = HandlerChain.new RequestHandlers::InvalidEmailHandler,
         RequestHandlers::LocalEmailHandler,
+        RequestHandlers::LeapEmailHandler,
         RequestHandlers::HkpEmailHandler,
         RequestHandlers::FingerprintHandler,
+        Proc.new {|_req| proxy_error_response },
         Proc.new { Nickserver::Response.new(404, "404 Not Found\n") }
-      ]
+      chain.continue_on HTTP::ConnectionError
+      return chain
+    end
+
+    def proxy_error_response
+      exception = handler_chain.rescued_exceptions.first
+      if exception
+        Nickserver::Response.new(502, exception.to_s)
+      end
     end
 
     def send_response(response)

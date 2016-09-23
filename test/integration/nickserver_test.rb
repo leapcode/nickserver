@@ -3,6 +3,13 @@ require 'support/http_stub_helper'
 require 'nickserver/server'
 require 'json'
 
+# Integration Test for the whole nickserver without network dependecy.
+#
+# These tests are meant to test the integration between the different
+# components of the nickserver from the ReelServer all the way down to
+# the different sources.
+# These tests do not test the low level network adapter, the daemonization
+# or the startup script.
 #
 # Some important notes to understanding these tests:
 #
@@ -29,6 +36,7 @@ class NickserverTest < Minitest::Test
   def test_GET_key_by_email_address_served_via_SKS
     uid    = 'cloudadmin@leap.se'
     key_id = 'E818C478D3141282F7590D29D041EB11B1647490'
+    stub_nicknym_available_response 'leap.se', status: 404
     stub_sks_vindex_reponse(uid, body: file_content(:leap_vindex_result))
     stub_sks_get_reponse(key_id, body: file_content(:leap_public_key))
 

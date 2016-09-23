@@ -19,7 +19,7 @@ module Nickserver; module Hkp
       if status == 200
         best = pick_best_key(response)
         get_key_by_fingerprint(best.keyid, nick)
-      else
+      elsif status != 404    # 404 means no key found and we proceed
         Nickserver::Response.new(status, response)
       end
     end
