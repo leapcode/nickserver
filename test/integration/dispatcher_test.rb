@@ -55,7 +55,7 @@ class Nickserver::DispatcherTest < Minitest::Test
     assert_response success
   end
 
-  def test_email_via_hkp_nicknym_unreachable
+  def test_email_not_found_hkp_nicknym_unreachable
     handle address: ['valid@email.tld'], headers: { "Host" => "http://nickserver.me" }
     stub_nicknym_raises
     hkp_source.expect :query, nil, [Nickserver::EmailAddress]
