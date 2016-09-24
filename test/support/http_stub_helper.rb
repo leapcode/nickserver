@@ -1,7 +1,7 @@
 module HttpStubHelper
 
   def stubbing_http
-    Nickserver::Adapters::CelluloidHttp.stub :new, adapter do
+    Nickserver::Adapters::Http.stub :new, adapter do
       yield
     end
     adapter.verify
