@@ -62,9 +62,11 @@ module Nickserver
     end
 
     def proxy_error_response
-      exception = handler_chain.rescued_exceptions.first
-      if exception
-        Nickserver::Response.new(502, exception.to_s)
+      exc = handler_chain.rescued_exceptions.first
+      if exc
+        puts "  Error: #{exc}"
+        Nickserver::Response.new 502,
+          %Q|{"error": "#{exc}"}|
       end
     end
 
