@@ -40,8 +40,8 @@ module Nickserver
     def handle(request)
       handler_chain.handle request
     rescue RuntimeError => exc
-      puts "Error: #{exc}"
-      puts exc.backtrace
+      $stderr.puts "Error: #{exc}"
+      $stderr.puts exc.backtrace
       ErrorResponse.new(exc.to_s)
     end
 
@@ -64,7 +64,7 @@ module Nickserver
     def proxy_error_response
       exc = handler_chain.rescued_exceptions.first
       if exc
-        puts "  Error: #{exc}"
+        $stderr.puts "  Error: #{exc}"
         Nickserver::Response.new 502,
           JSON.dump(error: exc.to_s)
       end

@@ -36,8 +36,8 @@ module Nickserver
       handler = handler_for(request)
       handler.respond_to params(request), request.headers
     rescue StandardError => e
-      puts e
-      puts e.backtrace.join "\n  "
+      $stderr.puts e
+      $stderr.puts e.backtrace.join "\n  "
       request.respond 500, "{}"
     end
 
