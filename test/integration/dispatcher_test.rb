@@ -59,7 +59,7 @@ class Nickserver::DispatcherTest < Minitest::Test
     handle address: ['valid@email.tld'], headers: { "Host" => "http://nickserver.me" }
     stub_nicknym_raises
     hkp_source.expect :query, nil, [Nickserver::EmailAddress]
-    assert_response response(status: 502, content: "HTTP::ConnectionError")
+    assert_response http_connection_error
   end
 
   def test_email_via_nicknym
@@ -124,6 +124,11 @@ class Nickserver::DispatcherTest < Minitest::Test
 
   def error(msg)
     response status: 500, content: "500 #{msg}\n"
+  end
+
+  def http_connection_error
+    response status: 502,
+      content: JSON.dump(error: "HTTP::ConnectionError")
   end
 
   def response(options)

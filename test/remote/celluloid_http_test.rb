@@ -17,6 +17,8 @@ class Nickserver::Adapters::CelluloidHttpTest < Minitest::Test
     url = Nickserver::Config.hkp_url
     status, _body = adapter.get url
     assert_equal 404, status
+  rescue HTTP::ConnectionError => e
+    skip "could not talk to hkp server: #{e}"
   end
 
   protected

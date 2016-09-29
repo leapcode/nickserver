@@ -66,7 +66,7 @@ module Nickserver
       if exc
         puts "  Error: #{exc}"
         Nickserver::Response.new 502,
-          %Q|{"error": "#{exc}"}|
+          JSON.dump(error: exc.to_s)
       end
     end
 

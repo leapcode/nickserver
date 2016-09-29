@@ -45,5 +45,7 @@ class RemoteHkpSourceTest < Minitest::Test
       assert_equal 200, status
       yield keys
     end
+  rescue HTTP::ConnectionError => e
+    skip "could not talk to hkp server: #{e}"
   end
 end
