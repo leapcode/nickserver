@@ -256,6 +256,7 @@ module Nickserver
         puts "\nShutting down..."
         exit(0)
       end
+      Config.log_file = STDOUT
       yield
       exit(0)
     end
