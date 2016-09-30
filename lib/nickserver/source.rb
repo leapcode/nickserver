@@ -1,9 +1,11 @@
-require 'nickserver/adapters/http'
+require 'nickserver/adapters/celluloid_http'
 
 module Nickserver
   class Source
 
-    def initialize(adapter = Nickserver::Adapters::Http.new)
+    DEFAULT_ADAPTER_CLASS = Nickserver::Adapters::CelluloidHttp
+
+    def initialize(adapter = DEFAULT_ADAPTER_CLASS.new)
       @adapter = adapter
     end
 
