@@ -1,8 +1,11 @@
 silence_warnings do
   require 'reel'
 end
+require 'logger'
+require 'nickserver/config'
 require 'nickserver/adapters/celluloid_http'
 require 'nickserver/dispatcher'
+require 'nickserver/logging_responder'
 
 module Nickserver
   class ReelServer < Reel::Server::HTTP
@@ -31,19 +34,20 @@ module Nickserver
     protected
 
     def handle_request(request)
-      puts "#{request.method} #{request.uri}"
-      puts "  #{params(request)}"
+      logger.info "#{request.method} #{request.uri}"
+      logger.debug "  #{params(request)}"
       handler = handler_for(request)
       handler.respond_to params(request), request.headers
     rescue StandardError => e
-      $stderr.puts e
-      $stderr.puts e.backtrace.join "\n  "
+      logger.error e
+      logger.error e.backtrace.join "\n  "
       request.respond 500, "{}"
     end
 
     def handler_for(request)
       # with reel the request is the responder
-      Dispatcher.new(request)
+      responder = LoggingResponder.new(request, logger)
+      Dispatcher.new(responder)
     end
 
     def params(request)
@@ -54,5 +58,8 @@ module Nickserver
       end
     end
 
+    def logger
+      @logger ||= ::Logger.new Config.log_file
+    end
   end
 end
