@@ -15,7 +15,7 @@ module Nickserver
     def respond_to(*args)
       responder.expect :respond, nil, args
       logging_responder = LoggingResponder.new responder, logger
-      logging_responder.respond *args
+      logging_responder.respond(*args)
       responder.verify
     end
 
