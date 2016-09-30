@@ -15,6 +15,7 @@ module Nickserver
     end
 
     def initialize(host = "127.0.0.1", port = 3000)
+      Celluloid.logger = logger
       super(host, port, &method(:on_connection))
     end
 
