@@ -5,17 +5,6 @@ require 'nickserver/hkp/source'
 class HkpTest < Minitest::Test
   include HttpStubHelper
 
-  def setup
-    super
-    Celluloid.boot
-  end
-
-  def teardown
-    Celluloid.shutdown
-    super
-  end
-
-
   def test_key_info_expired
     fetch_key_info(:hkp_vindex_result, 'lemur@leap.se') do |keys|
       assert_equal 1, keys.length, 'should find a single key'

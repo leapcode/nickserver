@@ -1,17 +1,8 @@
 require 'test_helper'
+require 'support/celluloid_test'
 require 'nickserver/hkp/source'
 
-class RemoteHkpSourceTest < Minitest::Test
-
-  def setup
-    super
-    Celluloid.boot
-  end
-
-  def teardown
-    Celluloid.shutdown
-    super
-  end
+class RemoteHkpSourceTest < CelluloidTest
 
   def test_key_info
     uid = 'elijah@riseup.net'

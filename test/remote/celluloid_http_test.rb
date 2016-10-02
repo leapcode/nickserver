@@ -1,17 +1,8 @@
 require 'test_helper'
+require 'support/celluloid_test'
 require 'nickserver/adapters/celluloid_http'
 
-class Nickserver::Adapters::CelluloidHttpTest < Minitest::Test
-
-  def setup
-    super
-    Celluloid.boot
-  end
-
-  def teardown
-    Celluloid.shutdown
-    super
-  end
+class Nickserver::Adapters::CelluloidHttpTest < CelluloidTest
 
   def test_https_for_hkp
     url = Nickserver::Config.hkp_url
