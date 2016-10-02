@@ -1,0 +1,22 @@
+title Nickserver Request-Response-Sequence
+
+Client-->Server: Request
+Server->*Responder: new
+Server->*Dispatcher: new(responder)
+Server->Dispatcher: respond_to(params, headers)
+# Dispatcher->*Request: new(params, headers)
+Dispatcher->*HandlerA: call(request)
+# HandlerA->Request: params
+# Request->HandlerA: address: 'mail@domain'
+note right of HandlerA: not responsible
+HandlerA-->Dispatcher: nil
+destroy HandlerA
+Dispatcher->*HandlerB: call(request)
+note right of HandlerB: responsible\nquery source and build response
+HandlerB-->Dispatcher: reponse
+destroy HandlerB
+Dispatcher->Responder: send_response(response)
+# destroy Request
+destroy Dispatcher
+Responder-->Client: Response
+destroy Responder
