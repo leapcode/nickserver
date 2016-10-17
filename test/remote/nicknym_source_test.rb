@@ -1,21 +1,12 @@
 require 'test_helper'
+require 'support/celluloid_test'
 require 'nickserver/nicknym/source'
 require 'nickserver/email_address'
 
 #
 # Please note the Readme.md file in this directory
 #
-class RemoteNicknymSourceTest < Minitest::Test
-
-  def setup
-    super
-    Celluloid.boot
-  end
-
-  def teardown
-    Celluloid.shutdown
-    super
-  end
+class RemoteNicknymSourceTest < CelluloidTest
 
   def test_availablility_check
     source.available_for? 'mail.bitmask.net'

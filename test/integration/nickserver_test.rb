@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'support/celluloid_test'
 require 'support/http_stub_helper'
 require 'nickserver/server'
 require 'json'
@@ -15,23 +16,14 @@ require 'json'
 #
 # (1) We mock the http adapter. So no network is required.
 #
-# (2) We actually start the nickserver on 127.0.0.1 and talk to it via http.
+# (2) We actually start the Reelserver on 127.0.0.1 and talk to it via http.
+#     In order to run the Reelserver properly this is a celluloid test.
 #
 # (3) the "Host" header for requests to nickserver must be set (or Config.domain set)
 #
 
-class NickserverTest < Minitest::Test
+class NickserverTest < CelluloidTest
   include HttpStubHelper
-
-  def setup
-    super
-    Celluloid.boot
-  end
-
-  def teardown
-    Celluloid.shutdown
-    super
-  end
 
   def test_GET_key_by_email_address_served_via_SKS
     uid    = 'cloudadmin@leap.se'

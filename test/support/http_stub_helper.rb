@@ -1,7 +1,9 @@
+require 'nickserver/source'
+
 module HttpStubHelper
 
   def stubbing_http
-    Nickserver::Adapters::CelluloidHttp.stub :new, adapter do
+    Nickserver::Source::DEFAULT_ADAPTER_CLASS.stub :new, adapter do
       yield
     end
     adapter.verify
