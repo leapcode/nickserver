@@ -18,9 +18,7 @@ class RemoteNicknymSourceTest < CelluloidTest
   def test_successful_query
     response = source.query(email_with_key)
     skip if response.status == 404
-    json = JSON.parse response.content
-    assert_equal email_with_key.to_s, json["address"]
-    refute_empty json["openpgp"]
+    assert_pgp_key_in response
   rescue HTTP::ConnectionError => e
     skip e.to_s
   end
@@ -28,12 +26,20 @@ class RemoteNicknymSourceTest < CelluloidTest
   def test_not_found
     response = source.query(email_without_key)
     skip if response.status == 200
-    assert response.status == 404
+    assert_equal 404, response.status
   rescue HTTP::ConnectionError => e
     skip e.to_s
   end
 
   protected
+
+  def assert_pgp_key_in(response)
+    json = JSON.parse response.content
+    assert_equal email_with_key.to_s, json["address"]
+    refute_empty json["openpgp"]
+  rescue JSON::ParserError
+    skip "invalid json response: #{response.content}"
+  end
 
   def source
     @source ||= Nickserver::Nicknym::Source.new
