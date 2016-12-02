@@ -25,4 +25,4 @@ before_script:
 
 test:
   script:
-  - bundle exec rake test
+  - TEST_OPTS=-v bundle exec rake test
