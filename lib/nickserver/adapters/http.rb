@@ -6,10 +6,28 @@ module Nickserver::Adapters
   class Http
 
     def get(url, options = {})
-      response = HTTP.get url,
-        params: options[:query],
-        ssl_context: ctx
+      url = HTTP::URI.parse url.to_s
+      response = get_with_auth url, params: options[:query]
       return response.code, response.to_s
+    end
+
+    protected
+
+    def get_with_auth(url, options)
+      options = default_options.merge options
+      http_with_basic_auth(url).get url, options
+    end
+
+    def http_with_basic_auth(url)
+      if url.password && (url.password != '')
+        HTTP.basic_auth(user: url.user, pass: url.password)
+      else
+        HTTP
+      end
+    end
+
+    def default_options
+      { ssl_context: ctx }
     end
 
     def ctx

@@ -12,5 +12,16 @@ module Nickserver::CouchDB
       Source.new(adapter).query address
       adapter.verify
     end
+
+    def test_401
+      address = "nick@domain.tl"
+      adapter = Minitest::Mock.new
+      adapter.expect :get, [401, nil],
+        [String,  {query: { reduce: "false", key: "\"#{address}\"" }}]
+      assert_raises Error do
+        Source.new(adapter).query address
+      end
+      adapter.verify
+    end
   end
 end
