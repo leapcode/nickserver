@@ -4,6 +4,8 @@ require 'nickserver/response'
 module Nickserver
   module Nicknym
     class Source < Nickserver::Source
+      # port we expect the remote nicknym to listen on
+      PORT = 6425
 
       def available_for?(domain)
         status, body = adapter.get "https://#{domain}/provider.json"
@@ -18,7 +20,7 @@ module Nickserver
       protected
 
       def nicknym_get(domain, query = {})
-        url = "https://nicknym.#{domain}:#{Config.port}"
+        url = "https://nicknym.#{domain}:#{PORT}"
         adapter.get(url, query: query)
       end
 
