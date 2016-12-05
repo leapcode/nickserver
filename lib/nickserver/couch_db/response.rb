@@ -17,13 +17,21 @@ module Nickserver::CouchDB
     end
 
     def content
-      key_response if ok? && !empty?
+      if ok? && !empty?
+        key_response
+      else
+        not_found_response
+      end
     end
 
     protected
 
     def key_response
       format address: nick.to_s, openpgp: key
+    end
+
+    def not_found_response
+      format({})
     end
 
     def format(response)
