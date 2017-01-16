@@ -1,0 +1,10 @@
+[Unit]
+Description=Leap nickserver 
+Before=apache2.service
+
+[Service]
+ExecStart=/usr/bin/ruby /usr/bin/nickserver start
+Type=forking
+
+[Install]
+WantedBy=multi-user.target
