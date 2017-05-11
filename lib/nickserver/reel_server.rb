@@ -6,6 +6,7 @@ require 'nickserver/config'
 require 'nickserver/adapters/celluloid_http'
 require 'nickserver/dispatcher'
 require 'nickserver/logging_responder'
+require 'nickserver/client_error'
 
 module Nickserver
   class ReelServer < Reel::Server::HTTP
@@ -35,14 +36,22 @@ module Nickserver
     protected
 
     def handle_request(request)
-      logger.info "#{request.method} #{request.uri}"
-      logger.debug "  #{params(request)}"
+      log_request(request)
       handler = handler_for(request)
       handler.respond_to params(request), request.headers
+    rescue ClientError => e
+      logger.warn e
+      request.respond 400, JSON.generate(error: e.message)
     rescue StandardError => e
       logger.error e
-      logger.error e.backtrace.join "\n  "
       request.respond 500, "{}"
+    end
+
+    def log_request(request)
+      logger.info "#{request.method} #{request.uri}"
+      logger.debug "  #{params(request)}"
+    rescue URI::Error => e
+      raise ClientError, e.message
     end
 
     def handler_for(request)

@@ -123,7 +123,7 @@ class Nickserver::DispatcherTest < Minitest::Test
   end
 
   def error(msg)
-    response status: 500, content: "500 #{msg}\n"
+    response status: 400, content: JSON.generate(error: msg)
   end
 
   def http_connection_error

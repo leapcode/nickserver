@@ -3,12 +3,12 @@ require 'nickserver/response'
 module Nickserver
   class ErrorResponse < Nickserver::Response
     def initialize(message)
-      @status = 500
-      @message = message + "\n"
+      @status = 400
+      @message = message
     end
 
     def content
-      "#{status} #{message}"
+      JSON.generate(error: message)
     end
 
     protected
