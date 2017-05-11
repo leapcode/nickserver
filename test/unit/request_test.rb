@@ -10,7 +10,7 @@ class Nickserver::RequestTest < Minitest::Test
 
   def test_blank_email
     request = request_with_params
-    assert_equal nil, request.email
+    assert_nil request.email
   end
 
   def test_fingerprint
