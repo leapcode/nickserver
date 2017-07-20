@@ -16,10 +16,13 @@ Gem::Specification.new do |gem|
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
+  gem.required_ruby_version = '~> 2.1'
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'minitest'
 
   gem.add_dependency 'reel'
   gem.add_dependency 'http'
+  # newer versions of nio4r do not work with ruby 2.1
+  gem.add_dependency 'nio4r', '~> 1.2'
 end

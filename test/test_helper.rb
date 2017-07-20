@@ -6,7 +6,6 @@ require 'bundler/setup'
 require 'minitest/autorun'
 require 'celluloid/test'
 require 'minitest/pride'
-require 'minitest/hell'
 
 require 'nickserver/config'
 
