@@ -35,7 +35,7 @@ GEM
       timers (>= 4.1.1)
     domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
-    hitimes (1.2.4)
+    hitimes (1.2.5)
     http (2.2.2)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
@@ -43,7 +43,7 @@ GEM
       http_parser.rb (~> 0.6.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
-    http-form_data (1.0.2)
+    http-form_data (1.0.3)
     http_parser.rb (0.6.0)
     minitest (5.10.2)
     nio4r (1.2.1)
@@ -74,4 +74,4 @@ DEPENDENCIES
   rake
 
 BUNDLED WITH
-   1.14.6
+   1.15.2
