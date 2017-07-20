@@ -24,5 +24,13 @@ before_script:
   - bundle exec ruby /builds/leap/nickserver/bin/nickserver version
 
 test:
+  stage: test
   script:
   - TEST_OPTS=-v bundle exec rake test
+
+bundle_audit:
+  stage: test
+  script: |
+    gem install bundler-audit
+    bundle-audit update
+    bundle-audit check
