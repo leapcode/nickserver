@@ -21,7 +21,7 @@ module Nickserver
       end
 
       def source
-        Nickserver::CouchDB::Source.new
+        Nickserver::CouchDB::Source.new adapter
       end
 
     end

@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'support/celluloid_test'
+require 'support/http_adapter_helper'
 require 'nickserver/nicknym/source'
 require 'nickserver/email_address'
 
@@ -7,6 +8,7 @@ require 'nickserver/email_address'
 # Please note the Readme.md file in this directory
 #
 class RemoteNicknymSourceTest < CelluloidTest
+  include HttpAdapterHelper
 
   def test_availablility_check
     source.available_for? 'mail.bitmask.net'
@@ -42,7 +44,7 @@ class RemoteNicknymSourceTest < CelluloidTest
   end
 
   def source
-    @source ||= Nickserver::Nicknym::Source.new
+    @source ||= Nickserver::Nicknym::Source.new adapter
   end
 
   def email_with_key

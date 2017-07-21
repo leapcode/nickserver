@@ -1,9 +1,9 @@
-require 'nickserver/source'
+require 'nickserver/reel_server'
 
 module HttpStubHelper
 
   def stubbing_http
-    Nickserver::Source::DEFAULT_ADAPTER_CLASS.stub :new, adapter do
+    Nickserver::ReelServer::DEFAULT_ADAPTER_CLASS.stub :new, adapter do
       yield
     end
     adapter.verify
