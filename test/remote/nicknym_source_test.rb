@@ -10,11 +10,22 @@ require 'nickserver/email_address'
 class RemoteNicknymSourceTest < CelluloidTest
   include HttpAdapterHelper
 
-  def test_availablility_check
+  def test_available_for_mail
     source.available_for? 'mail.bitmask.net'
-    refute source.available_for? 'dl.bitmask.net'   # not a provider
   rescue HTTP::ConnectionError => e
     skip e.to_s
+  end
+
+  # not a provider
+  def test_not_available
+    refute source.available_for? 'dl.bitmask.net'
+  rescue HTTP::ConnectionError => e
+    skip e.to_s
+  end
+
+  # cs.ucl.ac.uk only has an MX not an A-record
+  def test_not_available_without_a_record
+    refute source.available_for? 'cs.ucl.ac.uk'
   end
 
   def test_successful_query

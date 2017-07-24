@@ -24,6 +24,11 @@ class SampleTest < FunctionalTest
 
   # Regression Tests
 
+  # #3 handle missing A records
+  def test_nicknym
+    assert_lookup_status 404, 'postmaster@cs.ucl.ac.uk'
+  end
+
   def test_no_file_descriptors_leak
     lookup 'test@mail.bitmask.net'
     before = open_files_count

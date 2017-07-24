@@ -8,7 +8,8 @@ module Nickserver
       PORT = 6425
 
       def available_for?(domain)
-        status, body = adapter.get "https://#{domain}/provider.json"
+        status, body = adapter.get "https://#{domain}/provider.json",
+          rescue: 'failed to connect: getaddrinfo'
         status == 200 && provider_with_mx?(body)
       end
 

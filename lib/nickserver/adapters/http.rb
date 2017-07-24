@@ -2,6 +2,19 @@ require 'nickserver/adapters'
 require 'nickserver/config'
 require 'http'
 
+# Nickserver::Adapters::Http
+#
+# Basic http adapter with ssl and minimal error handling.
+# Only implemented get requests so far.
+#
+# Error Handling:
+#
+# Pass a string as the 'rescue' option. If a ConnectionError occures
+# which includes the string passed it will be rescued and the request
+# will return nil. This allows handling the error inside the adapter so
+# that for the derived CelluloidHttp Adapter the actor does not get
+# killed.
+
 module Nickserver::Adapters
   class Http
 
@@ -9,6 +22,8 @@ module Nickserver::Adapters
       url = HTTP::URI.parse url.to_s
       response = get_with_auth url, params: options[:query]
       return response.code, response.to_s
+    rescue HTTP::ConnectionError => e
+      raise unless options[:rescue] && e.to_s.include?(options[:rescue])
     end
 
     protected
