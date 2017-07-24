@@ -29,6 +29,7 @@ class SampleTest < FunctionalTest
     before = open_files_count
     lookup 'test@mail.bitmask.net'
     assert_equal before, open_files_count, 'Filedescriptors leaked'
+    assert (before > 0), 'Could not get filedescriptor count'
   end
 
   protected
@@ -46,7 +47,7 @@ class SampleTest < FunctionalTest
   end
 
   def open_files_count
-    `lsof | grep " #{nickserver_pid} " | wc -l`.to_i
+    run_command(%Q(lsof | grep " #{nickserver_pid} " | wc -l)).to_i
   end
 
   def run_command(command)
