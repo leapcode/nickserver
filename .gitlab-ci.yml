@@ -22,6 +22,8 @@ before_script:
   - gem install bundler  --no-ri --no-rdoc
   - bundle install -j $(nproc) --path vendor
   - bundle exec ruby /builds/leap/nickserver/bin/nickserver version
+  - apt update -y
+  - apt install -y lsof
 
 test:
   script:

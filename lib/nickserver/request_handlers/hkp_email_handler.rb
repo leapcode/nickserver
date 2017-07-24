@@ -16,7 +16,7 @@ module Nickserver
       end
 
       def source
-        Nickserver::Hkp::Source.new
+        Nickserver::Hkp::Source.new adapter
       end
 
     end

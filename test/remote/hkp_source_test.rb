@@ -1,8 +1,10 @@
 require 'test_helper'
 require 'support/celluloid_test'
+require 'support/http_adapter_helper'
 require 'nickserver/hkp/source'
 
 class RemoteHkpSourceTest < CelluloidTest
+  include HttpAdapterHelper
 
   def test_key_info
     uid = 'elijah@riseup.net'
@@ -31,12 +33,17 @@ class RemoteHkpSourceTest < CelluloidTest
 
   protected
 
-  def assert_key_info_for_uid(uid, &block)
-    Nickserver::Hkp::Source.new.search uid do |status, keys|
+  def assert_key_info_for_uid(uid)
+    source.search uid do |status, keys|
       assert_equal 200, status
       yield keys
     end
   rescue HTTP::ConnectionError => e
     skip "could not talk to hkp server: #{e}"
   end
+
+  def source
+    Nickserver::Hkp::Source.new adapter
+  end
+
 end

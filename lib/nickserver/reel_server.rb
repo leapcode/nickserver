@@ -10,6 +10,8 @@ require 'nickserver/logging_responder'
 module Nickserver
   class ReelServer < Reel::Server::HTTP
 
+    DEFAULT_ADAPTER_CLASS = Nickserver::Adapters::CelluloidHttp
+
     def self.start(options = {})
       new(options[:host], options[:port])
     end
@@ -35,20 +37,37 @@ module Nickserver
     protected
 
     def handle_request(request)
-      logger.info "#{request.method} #{request.uri}"
-      logger.debug "  #{params(request)}"
-      handler = handler_for(request)
-      handler.respond_to params(request), request.headers
+      logging_request(request) do
+        with_http_adapter do |adapter|
+          handler = handler_for(request, adapter)
+          handler.respond_to params(request), request.headers
+        end
+      end
     rescue StandardError => e
-      logger.error e
-      logger.error e.backtrace.join "\n  "
       request.respond 500, "{}"
     end
 
-    def handler_for(request)
+    def logging_request(request)
+      logger.info "#{request.method} #{request.uri}"
+      logger.debug "  #{params(request)}"
+      yield
+    rescue StandardError => e
+      logger.error e
+      logger.error e.backtrace.join "\n  "
+      raise
+    end
+
+    def with_http_adapter
+      adapter = DEFAULT_ADAPTER_CLASS.new
+      yield adapter
+    ensure
+      adapter.terminate if adapter.respond_to? :terminate
+    end
+
+    def handler_for(request, adapter)
       # with reel the request is the responder
       responder = LoggingResponder.new(request, logger)
-      Dispatcher.new(responder)
+      Dispatcher.new(responder, adapter)
     end
 
     def params(request)

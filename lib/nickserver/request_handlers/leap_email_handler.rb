@@ -13,7 +13,7 @@ module Nickserver
       protected
 
       def source
-        @source ||= Nicknym::Source.new
+        @source ||= Nicknym::Source.new adapter
       end
 
       def remote_email?
