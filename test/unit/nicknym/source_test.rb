@@ -1,4 +1,6 @@
 require 'test_helper'
+require 'http'
+require 'json'
 require 'nickserver/nicknym/source'
 require 'nickserver/email_address'
 
@@ -20,6 +22,11 @@ class NicknymSourceTest < Minitest::Test
     refute available_on?(200, 'blablabla')
   end
 
+  # adapter rescues name resolution errors and returns nothing
+  def test_not_available_without_response
+    refute available_on?
+  end
+
   def test_proxy_successful_query
     assert proxies_query_response?(200, 'dummy body')
   end
@@ -39,9 +46,9 @@ class NicknymSourceTest < Minitest::Test
     adapter.verify
   end
 
-  def available_on?(status = 0, body = nil)
-    adapter.expect :get, [status, body],
-      ['https://remote.tld/provider.json']
+  def available_on?(*args)
+    adapter.expect :get, args,
+      ['https://remote.tld/provider.json', Hash]
     available = source.available_for?('remote.tld')
     adapter.verify
     return available
