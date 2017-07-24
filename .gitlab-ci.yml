@@ -26,5 +26,13 @@ before_script:
   - apt install -y lsof
 
 test:
+  stage: test
   script:
   - TEST_OPTS=-v bundle exec rake test
+
+bundle_audit:
+  stage: test
+  script: |
+    gem install bundler-audit
+    bundle-audit update
+    bundle-audit check
