@@ -29,6 +29,11 @@ class SampleTest < FunctionalTest
     assert_lookup_status 404, 'postmaster@cs.ucl.ac.uk'
   end
 
+  # platform/#8674 handle nonexisting domains
+  def test_nicknym
+    assert_lookup_status 404, 'postmaster@now-dont-you-dare-register-this-domain.coop'
+  end
+
   def test_no_file_descriptors_leak
     lookup 'test@mail.bitmask.net'
     before = open_files_count
