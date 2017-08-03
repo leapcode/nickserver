@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    nickserver (0.9.0)
+    nickserver (0.10.0)
       http
       nio4r (~> 1.2)
       reel
