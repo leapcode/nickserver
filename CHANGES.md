@@ -1,3 +1,14 @@
+### version 0.10.0
+
+* fix filedescriptor leak by terminating celluloid actors
+* handle domains without A-record
+* send empty json object on 404 rather than nil
+* remote nicknym is on port 6425
+* use user:password@ prefix in http basic auth
+* require at least ruby 2.1
+* Add systemd service unit file
+* Restart nickserver automatically from systemd
+
 ### version 0.9.0
 
 * isolate http adapter
