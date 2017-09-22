@@ -27,8 +27,7 @@ module HttpStubHelper
 
   def stub_couch_response(uid, response = {})
     query = "\?key=#{"%22#{uid}%22"}&reduce=false"
-    stub_http_get /#{Regexp.escape(config.couch_url)}.*#{query}/,
-      response
+    stub_http_get(/#{Regexp.escape(config.couch_url)}.*#{query}/, response)
   end
 
   private
