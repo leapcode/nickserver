@@ -11,8 +11,7 @@ module Nickserver
       end
 
       def to_s
-        "https://#{domain}/.well-known/openpgpkey" +
-          "/hu/#{domain}/#{encoded_digest}"
+        "https://#{domain}/.well-known/openpgpkey/hu/#{encoded_digest}"
       end
 
       protected

@@ -34,10 +34,9 @@ class RemoteHkpSourceTest < CelluloidTest
   protected
 
   def assert_key_info_for_uid(uid)
-    source.search uid do |status, keys|
-      assert_equal 200, status
-      yield keys
-    end
+    status, keys = source.search uid
+    assert_equal 200, status
+    yield keys
   rescue HTTP::ConnectionError => e
     skip "could not talk to hkp server: #{e}"
   end
@@ -45,5 +44,4 @@ class RemoteHkpSourceTest < CelluloidTest
   def source
     Nickserver::Hkp::Source.new adapter
   end
-
 end
