@@ -37,6 +37,10 @@ module Nickserver
       address.split('@')[1]
     end
 
+    def local_part
+      address.split('@')[0]
+    end
+
     def to_s
       address
     end
