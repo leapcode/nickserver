@@ -2,13 +2,12 @@ require 'minitest/autorun'
 require 'minitest/pride'
 
 class BinTest < Minitest::Test
-
   def teardown
-    run_command "stop"
+    run_command 'stop'
   end
 
   def test_bin_loading
-    assert_command_runs("version")
+    assert_command_runs('version')
   end
 
   def test_not_running_by_default
@@ -16,26 +15,26 @@ class BinTest < Minitest::Test
   end
 
   def test_start
-    run_command "start"
+    run_command 'start'
     assert_running
   end
 
   protected
 
   def assert_running
-    status = run_command "status"
-    assert_includes status, "Nickserver running"
+    status = run_command 'status'
+    assert_includes status, 'Nickserver running'
   end
 
   def assert_stopped
-    status = run_command "status"
-    assert_includes status, "No nickserver processes are running."
+    status = run_command 'status'
+    assert_includes status, 'No nickserver processes are running.'
   end
 
   def assert_command_runs(command)
     out = run_command command
-    assert ($?.exitstatus == 0),
-      "failed to run 'nickserver #{command}':\n #{out}"
+    assert ($CHILD_STATUS.exitstatus == 0),
+           "failed to run 'nickserver #{command}':\n #{out}"
   end
 
   def run_command(command)
@@ -45,5 +44,4 @@ class BinTest < Minitest::Test
   def path_to_executable
     File.expand_path(File.dirname(__FILE__) + '/../../bin/nickserver')
   end
-
 end

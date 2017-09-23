@@ -7,7 +7,7 @@ class Nickserver::Hkp::VIndexResponseTest < Minitest::Test
 
   def test_leap_public_key
     response = response_for 'cloudadmin@leap.se',
-      body: file_content(:leap_vindex_result)
+                            body: file_content(:leap_vindex_result)
     assert_equal 'E818C478D3141282F7590D29D041EB11B1647490', response.keys.first.keyid
   end
 

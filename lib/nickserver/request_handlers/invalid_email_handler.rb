@@ -5,10 +5,9 @@ require 'nickserver/error_response'
 module Nickserver
   module RequestHandlers
     class InvalidEmailHandler < Base
-
       def handle
         return unless request.email
-        ErrorResponse.new("Not a valid address") if email.invalid?
+        ErrorResponse.new('Not a valid address') if email.invalid?
       end
 
       protected

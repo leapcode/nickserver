@@ -12,15 +12,30 @@ module Nickserver::Wkd
       assert_equal sample_url, url.to_s
     end
 
+    # we can be pretty sure this works for the person who proposed it
+    def test_gnupg_testuser_email
+      url = Url.new test_user_email
+      assert_equal test_user_url, url.to_s
+    end
+
     protected
+
+    def test_user_email
+      Nickserver::EmailAddress.new 'dewey@test.gnupg.org'
+    end
+
+    def test_user_url
+      'https://test.gnupg.org/.well-known/openpgpkey/hu/' \
+        '1g8totoxbt4zf6na1sukczp5fiewr1oe'
+    end
 
     def sample_email
       Nickserver::EmailAddress.new 'Joe.Doe@Example.ORG'
     end
 
     def sample_url
-      'https://example.org/.well-known/openpgpkey/' +
-        'hu/example.org/iy9q119eutrkn8s1mk4r39qejnbu3n5q'
+      'https://example.org/.well-known/openpgpkey/hu/' \
+        'iy9q119eutrkn8s1mk4r39qejnbu3n5q'
     end
   end
 end

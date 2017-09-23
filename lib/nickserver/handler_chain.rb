@@ -1,3 +1,5 @@
+require 'English'
+
 #
 # Handler Chain
 #
@@ -14,7 +16,6 @@
 
 module Nickserver
   class HandlerChain
-
     def initialize(*handlers)
       @handlers = handlers
       @exceptions_to_rescue = []
@@ -27,7 +28,7 @@ module Nickserver
 
     def handle(*args)
       result = nil
-      _handled_by = @handlers.find{|h| result = try_handler(h, *args)}
+      _handled_by = @handlers.find { |h| result = try_handler(h, *args) }
       result
     end
 
@@ -41,7 +42,7 @@ module Nickserver
     def try_handler(handler, *args)
       result = handler.call(*args)
     rescue *exceptions_to_rescue
-      self.rescued_exceptions << $!
+      rescued_exceptions << $ERROR_INFO
       result = false
     end
   end

@@ -9,14 +9,13 @@ require 'nickserver/logging_responder'
 
 module Nickserver
   class ReelServer < Reel::Server::HTTP
-
     DEFAULT_ADAPTER_CLASS = Nickserver::Adapters::CelluloidHttp
 
     def self.start(options = {})
       new(options[:host], options[:port])
     end
 
-    def initialize(host = "127.0.0.1", port = 3000)
+    def initialize(host = '127.0.0.1', port = 3000)
       Celluloid.logger = logger
       super(host, port, &method(:on_connection))
     end
@@ -33,7 +32,6 @@ module Nickserver
       end
     end
 
-
     protected
 
     def handle_request(request)
@@ -44,7 +42,7 @@ module Nickserver
         end
       end
     rescue StandardError
-      request.respond 500, "{}"
+      request.respond 500, '{}'
     end
 
     def logging_request(request)

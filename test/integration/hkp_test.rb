@@ -70,7 +70,7 @@ class HkpTest < Minitest::Test
   end
 
   def test_fetch_key_too_short
-    uid    = 'chiiph@leap.se'
+    uid = 'chiiph@leap.se'
 
     stubbing_http do
       stub_sks_vindex_reponse(uid, body: file_content(:short_key_vindex_result))
@@ -86,13 +86,13 @@ class HkpTest < Minitest::Test
     end
   end
 
-  def assert_response_for_uid(uid, &block)
+  def assert_response_for_uid(uid)
     Nickserver::Hkp::Source.new(adapter).query uid do |response|
       yield response
     end
   end
 
-  def assert_key_info_for_uid(uid, &block)
+  def assert_key_info_for_uid(uid)
     Nickserver::Hkp::Source.new(adapter).search uid do |status, keys|
       assert_equal 200, status
       yield keys
@@ -105,5 +105,4 @@ class HkpTest < Minitest::Test
       assert_key_info_for_uid(uid, &block)
     end
   end
-
 end

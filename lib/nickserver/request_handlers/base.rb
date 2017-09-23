@@ -1,7 +1,6 @@
 module Nickserver
   module RequestHandlers
     class Base
-
       def self.call(request, adapter = nil)
         new(request, adapter).handle
       end
@@ -12,8 +11,8 @@ module Nickserver
       end
 
       protected
+
       attr_reader :request, :adapter
     end
   end
 end
-

@@ -20,7 +20,8 @@ module Kernel
   # Sets $VERBOSE for the duration of the block and back to its original
   # value afterwards.
   def with_warnings(flag)
-    old_verbose, $VERBOSE = $VERBOSE, flag
+    old_verbose = $VERBOSE
+    $VERBOSE = flag
     yield
   ensure
     $VERBOSE = old_verbose

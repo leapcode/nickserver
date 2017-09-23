@@ -32,5 +32,4 @@ class LocalEmailHandlerTest < MiniTest::Test
   def source_class
     Nickserver::CouchDB::Source
   end
-
 end

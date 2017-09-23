@@ -1,70 +1,102 @@
 require 'cgi'
 require 'nickserver/hkp'
 
-#
-# Class to represent the key information result from a query to a key server
-# (but not the key itself).
-#
-# The initialize method parses the hkp 'machine readable' output.
-#
-# format definition of machine readable index output is here:
-# http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00#section-5.2
-#
 module Nickserver::Hkp
+  #
+  # Class to represent the key information result from a query to a key server
+  # (but not the key itself).
+  #
+  # The initialize method parses the hkp 'machine readable' output.
+  #
+  # format definition of machine readable index output is here:
+  # http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00#section-5.2
+  #
   class KeyInfo
-    attr_accessor :uids, :keyid, :algo, :flags
+    attr_accessor :uids
 
     def initialize(hkp_record)
       uid_lines = hkp_record.split("\n")
       pub_line  = uid_lines.shift
-      @keyid, @algo, @keylen_s, @creationdate_s, @expirationdate_s, @flags = pub_line.split(':')[1..-1]
-      @uids = []
-      uid_lines.each do |uid_line|
-        uid, _creationdate, _expirationdate, _flags = uid_line.split(':')[1..-1]
-        # for now, ignore the expirationdate and flags of uids. sks does return them anyway
-        @uids << CGI.unescape(uid.sub(/.*<(.+)>.*/, '\1'))
+      @properties = pub_line.split(':')[1..-1]
+      @uids = extract_uids(uid_lines)
+    end
+
+    CHECKS = %i[too_short? expired? revoked? disabled? outdated?].freeze
+
+    def error
+      CHECKS.find do |check|
+        msg = check.to_s.chop.tr('_', ' ')
+        "key is #{msg}." if send(check)
       end
+    end
+
+    def keyid
+      properties.first
+    end
+
+    def algo
+      properties.second
     end
 
     def keylen
-      @keylen ||= @keylen_s.to_i
+      properties[2].to_i
     end
 
     def creationdate
-      @creationdate ||= begin
-        if @creationdate_s
-          Time.at(@creationdate_s.to_i)
-        end
-      end
+      created = properties[3]
+      Time.at(created.to_i)
     end
 
     def expirationdate
-      @expirationdate ||= begin
-        if @expirationdate_s
-          Time.at(@expirationdate_s.to_i)
-        end
-      end
+      expires = properties[4]
+      Time.at(expires.to_i)
+    end
+
+    def flags
+      properties.last
     end
 
     def rsa?
-      @algo == "1"
+      algo == '1'
     end
 
     def dsa?
-      @algo == "17"
+      algo == '17'
     end
 
-    def revoked?
-      @flags =~ /r/
+    protected
+
+    attr_reader :properties
+
+    def extract_uids(uid_lines)
+      uid_lines.map do |uid_line|
+        # for now, ignore the expirationdate and flags of uids.
+        # sks does return them anyway
+        uid, _creationdate, _expirationdate, _flags = uid_line.split(':')[1..-1]
+        CGI.unescape(uid.sub(/.*<(.+)>.*/, '\1'))
+      end
     end
 
-    def disabled?
-      @flags =~ /d/
+    # CHECKS
+
+    def too_short?
+      keylen < 2048
     end
 
     def expired?
-      @flags =~ /e/
+      flags =~ /e/
+    end
+
+    def revoked?
+      flags =~ /r/
+    end
+
+    def disabled?
+      flags =~ /d/
+    end
+
+    def outdated?
+      expirationdate && expirationdate < Time.now
     end
   end
-
 end

@@ -2,7 +2,6 @@ require 'test_helper'
 require 'nickserver/email_address'
 
 class EmailAddressTest < Minitest::Test
-
   def test_domain
     nick = Nickserver::EmailAddress.new 'nick@test.me'
     assert_equal 'test.me', nick.domain
@@ -24,5 +23,4 @@ class EmailAddressTest < Minitest::Test
     nick = Nickserver::EmailAddress.new 'asdf'
     assert nick.invalid?
   end
-
 end

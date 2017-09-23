@@ -3,9 +3,8 @@ require 'minitest/autorun'
 require 'zbase32'
 
 class Zbase32Test < Minitest::Test
-
   def test_samples
-    samples.each do |k,v|
+    samples.each do |k, v|
       assert_equal k, decode(v)
       assert_equal v, encode(k)
     end

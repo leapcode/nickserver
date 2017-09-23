@@ -1,7 +1,6 @@
 require 'nickserver/adapters/celluloid_http'
 
 module HttpAdapterHelper
-
   def setup
     super
     @adapter = Nickserver::Adapters::CelluloidHttp.new
@@ -15,5 +14,4 @@ module HttpAdapterHelper
   protected
 
   attr_reader :adapter
-
 end

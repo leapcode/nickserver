@@ -1,7 +1,6 @@
 require 'nickserver/request'
 
 module RequestHandlerTestHelper
-
   protected
 
   def assert_refuses(opts = {})
@@ -33,9 +32,8 @@ module RequestHandlerTestHelper
   end
 
   def request(opts = {})
-    params = {'address' => [opts[:email]]}
-    headers = {'Host' => opts[:domain]}
+    params = { 'address' => [opts[:email]] }
+    headers = { 'Host' => opts[:domain] }
     Nickserver::Request.new params, headers
   end
-
 end

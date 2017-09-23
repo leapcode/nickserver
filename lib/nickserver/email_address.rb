@@ -1,6 +1,5 @@
 module Nickserver
   class EmailAddress
-
     REGEXP = begin
                qtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]'
                dtext = '[^\\x0d\\x5b-\\x5d\\x80-\\xff]'
@@ -48,6 +47,5 @@ module Nickserver
     protected
 
     attr_reader :address
-
   end
 end

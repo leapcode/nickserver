@@ -1,5 +1,4 @@
 class CelluloidTest < Minitest::Test
-
   def setup
     super
     Celluloid.boot
@@ -10,5 +9,4 @@ class CelluloidTest < Minitest::Test
     Celluloid.shutdown
     super
   end
-
 end

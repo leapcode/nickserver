@@ -19,8 +19,8 @@ class RemoteHkpSourceTest < CelluloidTest
     ca_file = file_path('mayfirst-ca.pem')
 
     config.stub(:hkp_url, hkp_url) do
+      # config.stub(:hkp_ca_file, file_path('autistici-ca.pem')) do
       config.stub(:hkp_ca_file, ca_file) do
-      #config.stub(:hkp_ca_file, file_path('autistici-ca.pem')) do
         assert File.exist?(Nickserver::Config.hkp_ca_file)
         uid = 'elijah@riseup.net'
         assert_key_info_for_uid uid do |keys|
@@ -34,10 +34,9 @@ class RemoteHkpSourceTest < CelluloidTest
   protected
 
   def assert_key_info_for_uid(uid)
-    source.search uid do |status, keys|
-      assert_equal 200, status
-      yield keys
-    end
+    status, keys = source.search uid
+    assert_equal 200, status
+    yield keys
   rescue HTTP::ConnectionError => e
     skip "could not talk to hkp server: #{e}"
   end
@@ -45,5 +44,4 @@ class RemoteHkpSourceTest < CelluloidTest
   def source
     Nickserver::Hkp::Source.new adapter
   end
-
 end

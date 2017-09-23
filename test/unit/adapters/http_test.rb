@@ -3,7 +3,6 @@ require 'http'
 require 'nickserver/adapters/http'
 
 class HttpAdapterTest < Minitest::Test
-
   def test_normal_raise
     stub_http_to_raise do
       assert_raises HTTP::ConnectionError do
@@ -29,7 +28,7 @@ class HttpAdapterTest < Minitest::Test
   protected
 
   def stub_http_to_raise(&block)
-    raises_exception = -> (*_args) {
+    raises_exception = lambda { |*_args|
       raise HTTP::ConnectionError, 'for some reason'
     }
     HTTP.stub :get, raises_exception, &block

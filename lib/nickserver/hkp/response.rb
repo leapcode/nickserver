@@ -1,6 +1,5 @@
 module Nickserver::Hkp
   class Response
-
     attr_reader :status, :content
 
     def initialize(uid, key)
@@ -13,6 +12,5 @@ module Nickserver::Hkp
     def format_response(map)
       map.to_json
     end
-
   end
 end

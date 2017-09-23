@@ -1,13 +1,12 @@
-#
-# Simple parser for Hkp KeyInfo responses.
-#
-# Focus is on simple here. Trying to avoid state and sideeffects.
-# Parsing a response with 12 keys and validating them takes 2ms.
-# So no need for memoization and making things more complex.
-#
-module Nickserver; module Hkp
+module Nickserver::Hkp
+  #
+  # Simple parser for Hkp KeyInfo responses.
+  #
+  # Focus is on simple here. Trying to avoid state and sideeffects.
+  # Parsing a response with 12 keys and validating them takes 2ms.
+  # So no need for memoization and making things more complex.
+  #
   class ParseKeyInfo
-
     # for this regexp to work, the source text must end in a trailing "\n",
     # which the output of sks does.
     MATCH_PUB_KEY = /(^pub:.+?\n(^uid:.+?\n)+)/m
@@ -40,14 +39,14 @@ module Nickserver; module Hkp
     protected
 
     def keys(uid)
-      key_infos(uid).reject { |key| error_for_key(key) }
+      key_infos(uid).reject(&:error)
     end
 
     def msg(uid)
       if errors(uid).any?
         error_messages(uid).join "\n"
       else
-        "Could not fetch keyinfo."
+        'Could not fetch keyinfo.'
       end
     end
 
@@ -63,13 +62,12 @@ module Nickserver; module Hkp
     end
 
     def errors(uid)
-      key_infos(uid).map{|key| error_for_key(key) }.compact
+      key_infos(uid).map(&:error).compact
     end
 
     def error_messages(uid)
       key_infos(uid).map do |key|
-        err = error_for_key(key)
-        error_message(uid, key, err)
+        error_message(uid, key)
       end.compact
     end
 
@@ -91,22 +89,8 @@ module Nickserver; module Hkp
       status == 200
     end
 
-    def error_message(uid, key, err)
-      "Ignoring key #{key.keyid} for #{uid}: #{err}" if err
-    end
-
-    def error_for_key(key)
-      if key.keylen < 2048
-        "key length is too short."
-      elsif key.expired?
-        "key expired."
-      elsif key.revoked?
-        "key revoked."
-      elsif key.disabled?
-        "key disabled."
-      elsif key.expirationdate && key.expirationdate < Time.now
-        "key expired"
-      end
+    def error_message(uid, key)
+      "Ignoring key #{key.keyid} for #{uid}: #{key.error}" if key.error
     end
   end
-end; end
+end

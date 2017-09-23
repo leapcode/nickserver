@@ -2,7 +2,6 @@ require 'test_helper'
 require 'nickserver/request'
 
 class Nickserver::RequestTest < Minitest::Test
-
   def test_email
     request = request_with_params address: fake_email
     assert_equal fake_email, request.email
@@ -19,8 +18,7 @@ class Nickserver::RequestTest < Minitest::Test
   end
 
   def test_domain
-    request = Nickserver::Request.new Hash.new,
-      'Host' => ' nicknym.my.domain.tld:123'
+    request = Nickserver::Request.new({}, 'Host' => ' nicknym.my.domain.tld:123')
     assert_equal 'my.domain.tld', request.domain
   end
 
@@ -29,7 +27,7 @@ class Nickserver::RequestTest < Minitest::Test
   # params are encoded with strings as keys and arrays with the
   # given value(s)
   def request_with_params(params = {})
-    params = params.collect{|k,v| [k.to_s, Array(v)]}.to_h
+    params = params.collect { |k, v| [k.to_s, Array(v)] }.to_h
     Nickserver::Request.new params, {}
   end
 
@@ -40,5 +38,4 @@ class Nickserver::RequestTest < Minitest::Test
   def fake_fingerprint
     'F' * 40
   end
-
 end

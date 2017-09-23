@@ -48,8 +48,8 @@ class RemoteNicknymSourceTest < CelluloidTest
 
   def assert_pgp_key_in(response)
     json = JSON.parse response.content
-    assert_equal email_with_key.to_s, json["address"]
-    refute_empty json["openpgp"]
+    assert_equal email_with_key.to_s, json['address']
+    refute_empty json['openpgp']
   rescue JSON::ParserError
     skip "invalid json response: #{response.content}"
   end
@@ -65,5 +65,4 @@ class RemoteNicknymSourceTest < CelluloidTest
   def email_without_key
     Nickserver::EmailAddress.new('pleaseneverusethisemailweuseittotest@mail.bitmask.net')
   end
-
 end

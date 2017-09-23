@@ -1,5 +1,3 @@
-inherit_from: .rubocop_todo.yml
-
 Style/GuardClause:
   Enabled: false
 
@@ -12,3 +10,6 @@ Lint/DeprecatedClassMethods:
 # complains about our nested module end; end style
 Lint/EndAlignment:
   Enabled: false
+
+Style/ClassAndModuleChildren:
+  EnforcedStyle: compact

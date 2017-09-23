@@ -1,5 +1,5 @@
-require "nickserver/version"
-require "nickserver/config"
+require 'nickserver/version'
+require 'nickserver/config'
 
 require 'etc'
 require 'fileutils'
@@ -10,9 +10,8 @@ require 'fileutils'
 
 module Nickserver
   class Daemon
-
     def self.run(name, &block)
-      self.new.run(name, &block)
+      new.run(name, &block)
     end
 
     def run(name, &block)
@@ -38,9 +37,7 @@ module Nickserver
       if username != 'root'
         if Process::Sys.getuid == 0
           Process::Sys.setuid(Etc.getpwnam(username).uid)
-          if root?
-            bail "failed to drop permissions"
-          end
+          bail 'failed to drop permissions' if root?
         else
           bail "cannot change process uid to #{username}"
         end
@@ -48,13 +45,11 @@ module Nickserver
     end
 
     def root?
-      begin
-        Process::Sys.setuid(0)
-      rescue Errno::EPERM
-        false
-      else
-        true
-      end
+      Process::Sys.setuid(0)
+    rescue Errno::EPERM
+      false
+    else
+      true
     end
 
     #
@@ -62,7 +57,7 @@ module Nickserver
     #
 
     def daemonize
-      return bail("Process is already started") if daemon_running?
+      return bail('Process is already started') if daemon_running?
       _pid = fork do
         exit if fork
         Process.setsid
@@ -71,7 +66,7 @@ module Nickserver
         catch_signals
         redirect_output
         drop_permissions_to(Config.user) if Config.user
-        File.umask 0000
+        File.umask 0o000
         yield
       end
     end
@@ -99,11 +94,7 @@ module Nickserver
 
     def pid_from_file(file)
       pid = IO.read(file).chomp
-      if pid != ""
-        pid.to_i
-      else
-        nil
-      end
+      pid.to_i if pid != ''
     end
 
     def kill_pid
@@ -134,10 +125,10 @@ module Nickserver
     # stop when we should
     #
     def catch_signals
-      ["SIGTERM", "SIGINT", "SIGHUP"].each do |signal|
-        Signal.trap(signal) {
+      %w[SIGTERM SIGINT SIGHUP].each do |signal|
+        Signal.trap(signal) do
           exit
-        }
+        end
       end
     end
 
@@ -149,15 +140,15 @@ module Nickserver
       puts msg
       puts
       puts "Usage: #{@name} [OPTION] COMMAND"
-      puts "COMMAND is one of: start, stop, restart, status, version, foreground"
-      puts "OPTION is one of: --verbose"
+      puts 'COMMAND is one of: start, stop, restart, status, version, foreground'
+      puts 'OPTION is one of: --verbose'
       puts
       exit 1
     end
 
     def bail(msg)
       puts "#{@name.capitalize} ERROR: #{msg}."
-      puts "Bailing out."
+      puts 'Bailing out.'
       exit(1)
     end
 
@@ -167,9 +158,9 @@ module Nickserver
     #
     def redirect_output
       if log_path = Config.log_file
-        FileUtils.mkdir_p File.dirname(log_path), mode: 0755
+        FileUtils.mkdir_p File.dirname(log_path), mode: 0o755
         FileUtils.touch log_path
-        File.chmod(0600, log_path)
+        File.chmod(0o600, log_path)
         if Config.user && Process::Sys.getuid == 0
           FileUtils.chown(Config.user, nil, log_path)
         end
@@ -195,10 +186,10 @@ module Nickserver
     # Runs until the block condition is met or the timeout_seconds is exceeded
     # until_true(10) { ...return_condition... }
     #
-    def until_true(timeout_seconds=MAX_WAIT, &block)
+    def until_true(timeout_seconds = MAX_WAIT)
       elapsed_seconds = 0
       interval = 0.5
-      while elapsed_seconds < timeout_seconds && block.call != true
+      while elapsed_seconds < timeout_seconds && yield != true
         elapsed_seconds += interval
         sleep(interval)
       end
@@ -208,18 +199,18 @@ module Nickserver
     def parse_options
       loop do
         case ARGV[0]
-          when 'start'      then ARGV.shift; @command = :start
-          when 'stop'       then ARGV.shift; @command = :stop
-          when 'restart'    then ARGV.shift; @command = :restart
-          when 'status'     then ARGV.shift; @command = :status
-          when 'version'    then ARGV.shift; @command = :version
-          when 'foreground' then ARGV.shift; @command = :foreground
-          when '--verbose'  then ARGV.shift; Config.verbose = true
-          when /^-/         then override_default_config(ARGV.shift, ARGV.shift)
-          else break
+        when 'start'      then ARGV.shift; @command = :start
+        when 'stop'       then ARGV.shift; @command = :stop
+        when 'restart'    then ARGV.shift; @command = :restart
+        when 'status'     then ARGV.shift; @command = :status
+        when 'version'    then ARGV.shift; @command = :version
+        when 'foreground' then ARGV.shift; @command = :foreground
+        when '--verbose'  then ARGV.shift; Config.verbose = true
+        when /^-/         then override_default_config(ARGV.shift, ARGV.shift)
+        else break
         end
       end
-      usage("Missing command") unless @command
+      usage('Missing command') unless @command
     end
 
     def override_default_config(flag, value)
@@ -251,8 +242,8 @@ module Nickserver
       end
     end
 
-    def command_foreground(&block)
-      trap("INT") do
+    def command_foreground
+      trap('INT') do
         puts "\nShutting down..."
         exit(0)
       end
@@ -285,6 +276,5 @@ module Nickserver
         exit(1) # must exit non-zero if not running
       end
     end
-
   end
 end
