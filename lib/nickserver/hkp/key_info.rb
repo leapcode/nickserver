@@ -21,17 +21,12 @@ module Nickserver::Hkp
       @uids = extract_uids(uid_lines)
     end
 
+    CHECKS = %i[too_short? expired? revoked? disabled? outdated?].freeze
+
     def error
-      if keylen < 2048
-        'key length is too short.'
-      elsif expired?
-        'key expired.'
-      elsif revoked?
-        'key revoked.'
-      elsif disabled?
-        'key disabled.'
-      elsif expirationdate && expirationdate < Time.now
-        'key expired'
+      CHECKS.find do |check|
+        msg = check.to_s.chop.tr('_', ' ')
+        "key is #{msg}." if send(check)
       end
     end
 
@@ -69,18 +64,6 @@ module Nickserver::Hkp
       algo == '17'
     end
 
-    def revoked?
-      flags =~ /r/
-    end
-
-    def disabled?
-      flags =~ /d/
-    end
-
-    def expired?
-      flags =~ /e/
-    end
-
     protected
 
     attr_reader :properties
@@ -92,6 +75,28 @@ module Nickserver::Hkp
         uid, _creationdate, _expirationdate, _flags = uid_line.split(':')[1..-1]
         CGI.unescape(uid.sub(/.*<(.+)>.*/, '\1'))
       end
+    end
+
+    # CHECKS
+
+    def too_short?
+      keylen < 2048
+    end
+
+    def expired?
+      flags =~ /e/
+    end
+
+    def revoked?
+      flags =~ /r/
+    end
+
+    def disabled?
+      flags =~ /d/
+    end
+
+    def outdated?
+      expirationdate && expirationdate < Time.now
     end
   end
 end
