@@ -9,7 +9,6 @@ require 'nickserver/hkp/key_info'
 # So no need for memoization and making things more complex.
 module Nickserver::Hkp
   class VIndexResponse
-
     # for this regexp to work, the source text must end in a trailing "\n",
     # which the output of sks does.
     MATCH_PUB_KEY = /(^pub:.+?\n(^uid:.+?\n)+)/m
@@ -36,7 +35,7 @@ module Nickserver::Hkp
       if errors.any?
         error_messages.join "\n"
       else
-        "Could not fetch keyinfo."
+        'Could not fetch keyinfo.'
       end
     end
 
@@ -53,7 +52,7 @@ module Nickserver::Hkp
     end
 
     def errors
-      key_infos.map{|key| error_for_key(key) }.compact
+      key_infos.map { |key| error_for_key(key) }.compact
     end
 
     def error_messages
@@ -81,15 +80,15 @@ module Nickserver::Hkp
 
     def error_for_key(key)
       if key.keylen < 2048
-        "key length is too short."
+        'key length is too short.'
       elsif key.expired?
-        "key expired."
+        'key expired.'
       elsif key.revoked?
-        "key revoked."
+        'key revoked.'
       elsif key.disabled?
-        "key disabled."
+        'key disabled.'
       elsif key.expirationdate && key.expirationdate < Time.now
-        "key expired"
+        'key expired'
       end
     end
   end

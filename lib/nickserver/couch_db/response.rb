@@ -3,7 +3,6 @@ require 'json'
 
 module Nickserver::CouchDB
   class Response
-
     def initialize(nick, couch_response = {})
       @nick = nick
       @couch_status = couch_response[:status]
@@ -39,7 +38,7 @@ module Nickserver::CouchDB
     end
 
     def key
-      rows.first["value"]
+      rows.first['value']
     end
 
     def ok?
@@ -51,7 +50,7 @@ module Nickserver::CouchDB
     end
 
     def rows
-      json["rows"]
+      json['rows']
     end
 
     attr_reader :couch_status, :json, :nick

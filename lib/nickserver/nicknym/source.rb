@@ -9,13 +9,13 @@ module Nickserver
 
       def available_for?(domain)
         status, body = adapter.get "https://#{domain}/provider.json",
-          rescue: 'failed to connect: getaddrinfo'
+                                   rescue: 'failed to connect: getaddrinfo'
         status == 200 && provider_with_mx?(body)
       end
 
       def query(email)
         status, body = nicknym_get email.domain, address: email.to_s
-        return Nickserver::Response.new(status, body)
+        Nickserver::Response.new(status, body)
       end
 
       protected

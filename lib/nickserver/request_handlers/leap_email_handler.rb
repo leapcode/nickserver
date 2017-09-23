@@ -5,7 +5,6 @@ require 'nickserver/nicknym/source'
 module Nickserver
   module RequestHandlers
     class LeapEmailHandler < Base
-
       def handle
         source.query(email) if request.email && remote_email? && nicknym_email?
       end
@@ -31,7 +30,6 @@ module Nickserver
       def domain
         Config.domain || request.domain
       end
-
     end
   end
 end

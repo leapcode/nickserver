@@ -32,26 +32,22 @@ module Nickserver::Hkp
 
     def creationdate
       @creationdate ||= begin
-        if @creationdate_s
-          Time.at(@creationdate_s.to_i)
-        end
+        Time.at(@creationdate_s.to_i) if @creationdate_s
       end
     end
 
     def expirationdate
       @expirationdate ||= begin
-        if @expirationdate_s
-          Time.at(@expirationdate_s.to_i)
-        end
+        Time.at(@expirationdate_s.to_i) if @expirationdate_s
       end
     end
 
     def rsa?
-      @algo == "1"
+      @algo == '1'
     end
 
     def dsa?
-      @algo == "17"
+      @algo == '17'
     end
 
     def revoked?
@@ -66,5 +62,4 @@ module Nickserver::Hkp
       @flags =~ /e/
     end
   end
-
 end

@@ -33,9 +33,9 @@ class NickserverTest < CelluloidTest
     stub_sks_get_reponse(key_id, body: file_content(:leap_public_key))
 
     start do
-      params = {query: {"address" => uid}}
+      params = { query: { 'address' => uid } }
       get(params) do |response|
-        assert_equal file_content(:leap_public_key), JSON.parse(response.to_s)["openpgp"]
+        assert_equal file_content(:leap_public_key), JSON.parse(response.to_s)['openpgp']
       end
     end
   end
@@ -45,19 +45,19 @@ class NickserverTest < CelluloidTest
     stub_sks_get_reponse(fingerprint, body: file_content(:leap_public_key))
 
     start do
-      params = {query: {"fingerprint" => fingerprint}}
+      params = { query: { 'fingerprint' => fingerprint } }
       get(params) do |response|
-        assert_equal file_content(:leap_public_key), JSON.parse(response.to_s)["openpgp"]
+        assert_equal file_content(:leap_public_key), JSON.parse(response.to_s)['openpgp']
       end
     end
   end
 
   def test_GET_served_via_couch_not_found
-    domain = "example.org"
-    uid    = "bananas@" + domain
+    domain = 'example.org'
+    uid    = 'bananas@' + domain
     stub_couch_response(uid, status: 404) do
       start do
-        params = {query: {"address" => uid}, head: {"Host" => domain}}
+        params = { query: { 'address' => uid }, head: { 'Host' => domain } }
         get(params) do |response|
           assert_equal 404, response.code
         end
@@ -66,11 +66,11 @@ class NickserverTest < CelluloidTest
   end
 
   def test_GET_served_via_couch_empty_results
-    domain = "example.org"
-    uid    = "stompy@" + domain
+    domain = 'example.org'
+    uid    = 'stompy@' + domain
     stub_couch_response(uid, body: file_content(:empty_couchdb_result)) do
       start do
-        params = {query: {"address" => uid}, head: {host: domain}}
+        params = { query: { 'address' => uid }, head: { host: domain } }
         get(params) do |response|
           assert_equal 404, response.code
         end
@@ -79,11 +79,11 @@ class NickserverTest < CelluloidTest
   end
 
   def test_GET_served_via_couch_success
-    domain = "example.org"
-    uid    = "blue@" + domain
+    domain = 'example.org'
+    uid    = 'blue@' + domain
     stub_couch_response(uid, body: file_content(:blue_couchdb_result)) do
       start do
-        params = {query: {"address" => uid}, head: {"Host" => domain}}
+        params = { query: { 'address' => uid }, head: { 'Host' => domain } }
         get(params) do |response|
           assert_equal file_content(:blue_nickserver_result), response.to_s
         end
@@ -104,7 +104,7 @@ class NickserverTest < CelluloidTest
   #
   # start nickserver
   #
-  def start(timeout = 1)
+  def start(_timeout = 1)
     server = Nickserver::ReelServer.new '127.0.0.1', config.port
     stubbing_http do
       yield server
@@ -133,10 +133,9 @@ class NickserverTest < CelluloidTest
   # this works because http requests to 127.0.0.1 are not stubbed, but requests to other domains are.
   #
   def request(method, options = {})
-    response = HTTP.
-      headers(options.delete(:head)).
-      request method, "http://127.0.0.1:#{config.port}/", options
+    response = HTTP
+               .headers(options.delete(:head))
+               .request method, "http://127.0.0.1:#{config.port}/", options
     yield response
   end
-
 end

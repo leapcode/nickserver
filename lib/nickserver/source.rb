@@ -1,6 +1,5 @@
 module Nickserver
   class Source
-
     def initialize(adapter = nil)
       @adapter = adapter
     end

@@ -5,7 +5,6 @@ require 'nickserver/nicknym/source'
 require 'nickserver/email_address'
 
 class NicknymSourceTest < Minitest::Test
-
   def test_initialization
     assert source
   end
@@ -39,7 +38,7 @@ class NicknymSourceTest < Minitest::Test
 
   def proxies_query_response?(status = 0, body = nil)
     adapter.expect :get, [status, body],
-      ['https://nicknym.leap_powered.tld:6425', query: {address: email_stub.to_s}]
+                   ['https://nicknym.leap_powered.tld:6425', query: { address: email_stub.to_s }]
     response = source.query(email_stub)
     assert_equal status, response.status
     assert_equal body, response.content
@@ -48,10 +47,10 @@ class NicknymSourceTest < Minitest::Test
 
   def available_on?(*args)
     adapter.expect :get, args,
-      ['https://remote.tld/provider.json', Hash]
+                   ['https://remote.tld/provider.json', Hash]
     available = source.available_for?('remote.tld')
     adapter.verify
-    return available
+    available
   end
 
   def source

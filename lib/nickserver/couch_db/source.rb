@@ -9,9 +9,8 @@ module Nickserver::CouchDB
   class Error < StandardError; end
 
   class Source < Nickserver::Source
-
-    VIEW = '/_design/Identity/_view/pgp_key_by_email'
-    UNEXPECTED_RESPONSE_CODES = [401, 500]
+    VIEW = '/_design/Identity/_view/pgp_key_by_email'.freeze
+    UNEXPECTED_RESPONSE_CODES = [401, 500].freeze
 
     def query(nick)
       status, body = adapter.get url, query: query_for(nick)
@@ -23,7 +22,7 @@ module Nickserver::CouchDB
 
     def handle_unexpected_responses(status, body)
       if UNEXPECTED_RESPONSE_CODES.include? status
-        raise Error.new("Couch responded with #{status}: #{body}")
+        raise Error, "Couch responded with #{status}: #{body}"
       end
     end
 
@@ -32,7 +31,7 @@ module Nickserver::CouchDB
     end
 
     def query_for(nick)
-      { reduce: "false", key: "\"#{nick}\"" }
+      { reduce: 'false', key: "\"#{nick}\"" }
     end
 
     attr_reader :config

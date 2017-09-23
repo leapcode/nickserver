@@ -10,7 +10,6 @@ require 'nickserver/reel_server'
 #
 module Nickserver
   class Server
-
     #
     # Starts the Nickserver.
     #
@@ -19,7 +18,7 @@ module Nickserver
     #   * :port (default Nickserver::Config.port)
     #   * :host (default 127.0.0.1)
     #
-    def self.start(opts={})
+    def self.start(opts = {})
       Nickserver::Config.load
       options = {
         host: '127.0.0.1',
@@ -32,7 +31,5 @@ module Nickserver
 
       Nickserver::ReelServer.start(options)
     end
-
-
   end
 end

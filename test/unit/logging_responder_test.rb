@@ -3,10 +3,9 @@ require 'nickserver/logging_responder'
 
 module Nickserver
   class LoggingResponderTest < Minitest::Test
-
     def test_responds_and_logs
-      logger.expect :info, nil, [" -> 200"]
-      respond_to 200, "body"
+      logger.expect :info, nil, [' -> 200']
+      respond_to 200, 'body'
       logger.verify
     end
 
@@ -26,6 +25,5 @@ module Nickserver
     def logger
       @logger ||= Minitest::Mock.new
     end
-
   end
 end

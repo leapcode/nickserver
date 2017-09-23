@@ -1,5 +1,4 @@
 module ZBase32
-
   ALPHABET = 'ybndrfg8ejkmcpqxot1uwisza345h769'.split('').freeze
 
   def self.encode32(bin_string)
@@ -13,7 +12,6 @@ module ZBase32
       ALPHABET.index(char).to_s(2).rjust(5, '0')
     end.join
     bin[0, (8 * (bin.length / 8))]
-     # .sub /10*$/ ,'1'
+    # .sub /10*$/ ,'1'
   end
-
 end

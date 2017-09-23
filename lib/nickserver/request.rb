@@ -6,11 +6,11 @@ module Nickserver
     end
 
     def email
-      param("address")
+      param('address')
     end
 
     def fingerprint
-      param("fingerprint")
+      param('fingerprint')
     end
 
     def domain

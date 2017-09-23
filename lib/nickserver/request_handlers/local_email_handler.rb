@@ -5,7 +5,6 @@ require 'nickserver/couch_db/source'
 module Nickserver
   module RequestHandlers
     class LocalEmailHandler < Base
-
       def handle
         source.query(email) if request.email && email.domain?(domain)
       end
@@ -23,7 +22,6 @@ module Nickserver
       def source
         Nickserver::CouchDB::Source.new adapter
       end
-
     end
   end
 end

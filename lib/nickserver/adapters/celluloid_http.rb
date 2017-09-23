@@ -4,6 +4,7 @@ silence_warnings do
 end
 
 module Nickserver::Adapters
+  # HTTP Adapter using Celluloid::IO
   class CelluloidHttp < Http
     silence_warnings do
       include Celluloid::IO
@@ -14,6 +15,5 @@ module Nickserver::Adapters
     def default_options
       super.merge ssl_socket_class: Celluloid::IO::SSLSocket
     end
-
   end
 end

@@ -4,7 +4,7 @@ require 'nickserver/couch_db/source'
 
 module Nickserver::CouchDB
   class SourceTest < Minitest::Test
-  include FileContent
+    include FileContent
 
     def test_couch_query_and_response
       adapter = adapter_returns 200, file_content(:blue_couchdb_result)

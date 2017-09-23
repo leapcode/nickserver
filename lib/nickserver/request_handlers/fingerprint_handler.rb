@@ -5,7 +5,6 @@ require 'nickserver/error_response'
 module Nickserver
   module RequestHandlers
     class FingerprintHandler < Base
-
       def handle
         return unless fingerprint
         if fingerprint.length == 40 && !fingerprint[/\H/]
@@ -24,7 +23,6 @@ module Nickserver
       def source
         Nickserver::Hkp::Source.new adapter
       end
-
     end
   end
 end

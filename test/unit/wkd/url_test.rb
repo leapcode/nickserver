@@ -25,7 +25,7 @@ module Nickserver::Wkd
     end
 
     def test_user_url
-      'https://test.gnupg.org/.well-known/openpgpkey/hu/' +
+      'https://test.gnupg.org/.well-known/openpgpkey/hu/' \
         '1g8totoxbt4zf6na1sukczp5fiewr1oe'
     end
 
@@ -34,7 +34,7 @@ module Nickserver::Wkd
     end
 
     def sample_url
-      'https://example.org/.well-known/openpgpkey/hu/' +
+      'https://example.org/.well-known/openpgpkey/hu/' \
         'iy9q119eutrkn8s1mk4r39qejnbu3n5q'
     end
   end

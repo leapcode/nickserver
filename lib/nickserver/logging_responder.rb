@@ -1,6 +1,5 @@
 module Nickserver
   class LoggingResponder
-
     def initialize(responder, logger)
       @responder = responder
       @logger = logger

@@ -23,7 +23,6 @@ require 'nickserver/request_handlers/fingerprint_handler'
 
 module Nickserver
   class Dispatcher
-
     def initialize(responder, adapter = nil)
       @responder = responder
       @adapter = adapter
@@ -49,23 +48,22 @@ module Nickserver
 
     def init_handler_chain
       chain = HandlerChain.new RequestHandlers::InvalidEmailHandler,
-        RequestHandlers::LocalEmailHandler,
-        RequestHandlers::LeapEmailHandler,
-        RequestHandlers::HkpEmailHandler,
-        RequestHandlers::FingerprintHandler,
-        Proc.new { proxy_error_response },
-        Proc.new { Nickserver::Response.new(404, "404 Not Found\n") }
+                               RequestHandlers::LocalEmailHandler,
+                               RequestHandlers::LeapEmailHandler,
+                               RequestHandlers::HkpEmailHandler,
+                               RequestHandlers::FingerprintHandler,
+                               proc { proxy_error_response },
+                               proc { Nickserver::Response.new(404, "404 Not Found\n") }
       chain.continue_on HTTP::ConnectionError
-      return chain
+      chain
     end
 
     def proxy_error_response
       exc = handler_chain.rescued_exceptions.first
       if exc
         Nickserver::Response.new 502,
-          JSON.dump(error: exc.to_s)
+                                 JSON.dump(error: exc.to_s)
       end
     end
-
   end
 end

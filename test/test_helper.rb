@@ -23,7 +23,7 @@ class Minitest::Test
   end
 
   def file_path(filename)
-    "%s/files/%s" % [File.dirname(__FILE__), filename]
+    format('%s/files/%s', File.dirname(__FILE__), filename)
   end
 
   def config

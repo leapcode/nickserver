@@ -4,7 +4,6 @@ require 'zbase32'
 module Nickserver
   module Wkd
     class Url
-
       def initialize(email)
         @domain = email.domain.downcase
         @local_part = email.local_part.downcase

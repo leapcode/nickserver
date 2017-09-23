@@ -49,7 +49,7 @@ class SampleTest < FunctionalTest
   end
 
   def lookup(address)
-    run_command %Q(curl localhost:6425 #{curl_opts} -d "address=#{address}")
+    run_command %(curl localhost:6425 #{curl_opts} -d "address=#{address}")
   end
 
   def curl_opts
@@ -57,13 +57,13 @@ class SampleTest < FunctionalTest
   end
 
   def open_files_count
-    run_command(%Q(lsof | grep " #{nickserver_pid} " | wc -l)).to_i
+    run_command(%(lsof | grep " #{nickserver_pid} " | wc -l)).to_i
   end
 
   def run_command(command)
     `#{command} 2>&1`.tap do |out|
-      assert ($?.exitstatus == 0),
-        "failed to run '#{command}':\n #{out}"
+      assert ($CHILD_STATUS.exitstatus == 0),
+             "failed to run '#{command}':\n #{out}"
     end
   end
 end

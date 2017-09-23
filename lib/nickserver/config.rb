@@ -5,7 +5,7 @@ module Nickserver
     PATHS = [
       File.expand_path('../../../config/default.yml', __FILE__),
       '/etc/nickserver.yml'
-    ]
+    ].freeze
 
     class << self
       attr_accessor :hkp_url
@@ -29,22 +29,21 @@ module Nickserver
     def self.load
       self.loaded ||= begin
         PATHS.each do |file_path|
-          self.load_config(file_path)
+          load_config(file_path)
         end
         true
       end
-      self.validate
+      validate
     end
 
     def self.couch_url
-      [ 'http://',
-        couch_auth,
-        couch_host,
-        ':',
-        couch_port,
-        '/',
-        couch_database
-      ].join
+      ['http://',
+       couch_auth,
+       couch_host,
+       ':',
+       couch_port,
+       '/',
+       couch_database].join
     end
 
     def self.couch_auth
@@ -70,22 +69,20 @@ module Nickserver
     end
 
     def self.load_config(file_path)
-      begin
-        YAML.load(File.read(file_path)).each do |key, value|
-          begin
-            self.send("#{key}=", value)
-          rescue NoMethodError
-            STDERR.puts "ERROR in file #{file_path}, '#{key}' is not a valid option"
-            exit(1)
-          end
+      YAML.safe_load(File.read(file_path)).each do |key, value|
+        begin
+          send("#{key}=", value)
+        rescue NoMethodError
+          STDERR.puts "ERROR in file #{file_path}, '#{key}' is not a valid option"
+          exit(1)
         end
-        puts "Loaded #{file_path}" if Config.verbose
-      rescue Errno::ENOENT => exc
-        puts "Skipping #{file_path}" if Config.verbose
-      rescue Exception => exc
-        STDERR.puts exc.inspect
-        exit(1)
       end
+      puts "Loaded #{file_path}" if Config.verbose
+    rescue Errno::ENOENT => exc
+      puts "Skipping #{file_path}" if Config.verbose
+    rescue Exception => exc
+      STDERR.puts exc.inspect
+      exit(1)
     end
   end
 end

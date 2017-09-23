@@ -5,9 +5,8 @@
 # Parsing a response with 12 keys and validating them takes 2ms.
 # So no need for memoization and making things more complex.
 #
-module Nickserver; module Hkp
+module Nickserver::Hkp
   class ParseKeyInfo
-
     # for this regexp to work, the source text must end in a trailing "\n",
     # which the output of sks does.
     MATCH_PUB_KEY = /(^pub:.+?\n(^uid:.+?\n)+)/m
@@ -47,7 +46,7 @@ module Nickserver; module Hkp
       if errors(uid).any?
         error_messages(uid).join "\n"
       else
-        "Could not fetch keyinfo."
+        'Could not fetch keyinfo.'
       end
     end
 
@@ -63,7 +62,7 @@ module Nickserver; module Hkp
     end
 
     def errors(uid)
-      key_infos(uid).map{|key| error_for_key(key) }.compact
+      key_infos(uid).map { |key| error_for_key(key) }.compact
     end
 
     def error_messages(uid)
@@ -97,16 +96,16 @@ module Nickserver; module Hkp
 
     def error_for_key(key)
       if key.keylen < 2048
-        "key length is too short."
+        'key length is too short.'
       elsif key.expired?
-        "key expired."
+        'key expired.'
       elsif key.revoked?
-        "key revoked."
+        'key revoked.'
       elsif key.disabled?
-        "key disabled."
+        'key disabled.'
       elsif key.expirationdate && key.expirationdate < Time.now
-        "key expired"
+        'key expired'
       end
     end
   end
-end; end
+end
