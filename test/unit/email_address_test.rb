@@ -10,6 +10,11 @@ class EmailAddressTest < Minitest::Test
     assert !nick.domain?('est.me')
   end
 
+  def test_local_part
+    nick = Nickserver::EmailAddress.new 'nick@test.me'
+    assert_equal 'nick', nick.local_part
+  end
+
   def test_valid
     nick = Nickserver::EmailAddress.new 'nick@remote.domain'
     assert nick.valid?

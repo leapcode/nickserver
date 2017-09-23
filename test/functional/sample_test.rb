@@ -18,19 +18,19 @@ class SampleTest < FunctionalTest
   #   assert_lookup_status 400, 'invalid'
   # end
 
-  def test_nicknym
+  def test_nicknym_success
     assert_lookup_status 200, 'test@mail.bitmask.net'
   end
 
   # Regression Tests
 
   # #3 handle missing A records
-  def test_nicknym
+  def test_nicknym_handles_missing_a_record
     assert_lookup_status 404, 'postmaster@cs.ucl.ac.uk'
   end
 
   # platform/#8674 handle nonexisting domains
-  def test_nicknym
+  def test_nicknym_handles_missing_domain
     assert_lookup_status 404, 'postmaster@now-dont-you-dare-register-this-domain.coop'
   end
 

@@ -43,7 +43,7 @@ module Nickserver
           handler.respond_to params(request), request.headers
         end
       end
-    rescue StandardError => e
+    rescue StandardError
       request.respond 500, "{}"
     end
 
