@@ -21,6 +21,20 @@ module Nickserver::Hkp
       @uids = extract_uids(uid_lines)
     end
 
+    def error
+      if keylen < 2048
+        'key length is too short.'
+      elsif expired?
+        'key expired.'
+      elsif revoked?
+        'key revoked.'
+      elsif disabled?
+        'key disabled.'
+      elsif expirationdate && expirationdate < Time.now
+        'key expired'
+      end
+    end
+
     def keyid
       properties.first
     end

@@ -39,7 +39,7 @@ module Nickserver::Hkp
     protected
 
     def keys(uid)
-      key_infos(uid).reject { |key| error_for_key(key) }
+      key_infos(uid).reject(&:error)
     end
 
     def msg(uid)
@@ -62,13 +62,12 @@ module Nickserver::Hkp
     end
 
     def errors(uid)
-      key_infos(uid).map { |key| error_for_key(key) }.compact
+      key_infos(uid).map(&:error).compact
     end
 
     def error_messages(uid)
       key_infos(uid).map do |key|
-        err = error_for_key(key)
-        error_message(uid, key, err)
+        error_message(uid, key)
       end.compact
     end
 
@@ -90,22 +89,8 @@ module Nickserver::Hkp
       status == 200
     end
 
-    def error_message(uid, key, err)
-      "Ignoring key #{key.keyid} for #{uid}: #{err}" if err
-    end
-
-    def error_for_key(key)
-      if key.keylen < 2048
-        'key length is too short.'
-      elsif key.expired?
-        'key expired.'
-      elsif key.revoked?
-        'key revoked.'
-      elsif key.disabled?
-        'key disabled.'
-      elsif key.expirationdate && key.expirationdate < Time.now
-        'key expired'
-      end
+    def error_message(uid, key)
+      "Ignoring key #{key.keyid} for #{uid}: #{key.error}" if key.error
     end
   end
 end
