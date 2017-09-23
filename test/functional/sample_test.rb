@@ -1,3 +1,4 @@
+require 'English'
 require 'support/functional_test'
 
 class SampleTest < FunctionalTest

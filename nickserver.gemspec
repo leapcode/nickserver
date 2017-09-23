@@ -1,5 +1,7 @@
 # -*- encoding: utf-8 -*-
 
+require 'English'
+
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'nickserver/version'
@@ -10,8 +12,12 @@ Gem::Specification.new do |gem|
   gem.authors       = ['elijah']
   gem.email         = ['elijah@riseup.net']
   gem.description   = 'Provides a directory service to map uid to public key.'
-  gem.summary       = 'Nickserver provides the ability to map a uid (user@domain.org) to a public key. This is the opposite of a key server, whose job it is to map public key to uid. Nickserver is lightweight and asynchronous.'
   gem.homepage      = 'https://leap.se'
+  gem.summary       = <<-EOSUM
+Nickserver provides the ability to map a uid (user@domain.org) to a public key.
+This is the opposite of a key server, whose job it is to map public key to uid.
+Nickserver is lightweight and asynchronous.
+  EOSUM
 
   gem.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }

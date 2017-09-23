@@ -1,4 +1,5 @@
 require 'nickserver/hkp'
+require 'nickserver/config'
 
 module Nickserver::Hkp
   #
@@ -35,7 +36,7 @@ module Nickserver::Hkp
     def get(query)
       # in practice, exact=on seems to have no effect
       query = { exact: 'on', options: 'mr' }.merge query
-      response = adapter.get Config.hkp_url, query: query
+      response = adapter.get Nickserver::Config.hkp_url, query: query
       response
     end
   end

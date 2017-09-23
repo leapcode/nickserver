@@ -1,3 +1,5 @@
+require 'English'
+
 #
 # Handler Chain
 #

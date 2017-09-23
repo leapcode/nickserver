@@ -1,11 +1,11 @@
-#
-# Simple parser for Hkp KeyInfo responses.
-#
-# Focus is on simple here. Trying to avoid state and sideeffects.
-# Parsing a response with 12 keys and validating them takes 2ms.
-# So no need for memoization and making things more complex.
-#
 module Nickserver::Hkp
+  #
+  # Simple parser for Hkp KeyInfo responses.
+  #
+  # Focus is on simple here. Trying to avoid state and sideeffects.
+  # Parsing a response with 12 keys and validating them takes 2ms.
+  # So no need for memoization and making things more complex.
+  #
   class ParseKeyInfo
     # for this regexp to work, the source text must end in a trailing "\n",
     # which the output of sks does.

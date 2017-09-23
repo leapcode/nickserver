@@ -16,13 +16,13 @@ module HttpStubHelper
                   Hash
   end
 
-  def stub_sks_vindex_reponse(_uid, response = {})
+  def stub_sks_vindex_reponse(uid, response = {})
     stub_http_get config.hkp_url,
                   response,
-                  query: vindex_query
+                  query: vindex_query(uid)
   end
 
-  def vindex_query
+  def vindex_query(uid)
     { op: 'vindex',
       search: uid,
       exact: 'on',
@@ -30,13 +30,13 @@ module HttpStubHelper
       fingerprint: 'on' }
   end
 
-  def stub_sks_get_reponse(_key_id, response = {})
+  def stub_sks_get_reponse(key_id, response = {})
     stub_http_get config.hkp_url,
                   response,
-                  query: sks_get_query
+                  query: sks_get_query(key_id)
   end
 
-  def sks_get_query
+  def sks_get_query(key_id)
     { op: 'get',
       search: '0x' + key_id,
       exact: 'on',

@@ -9,7 +9,9 @@ module Nickserver::Wkd
     def query(email)
       url = Url.new(email)
       status, blob = adapter.get url
-      Hkp::Response.new(email.to_s, armor_key(blob)) if status == 200
+      if status == 200
+        Nickserver::Hkp::Response.new(email.to_s, armor_key(blob))
+      end
     end
 
     protected

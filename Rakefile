@@ -28,9 +28,7 @@ $gem_path  = File.join($base_dir, 'pkg', "#{$spec.name}-#{$spec.version}.gem")
 def run(cmd)
   PTY.spawn(cmd) do |output, _input, _pid|
     begin
-      while line = output.gets
-        puts line
-      end
+      output.each { |line| puts line }
     rescue Errno::EIO
     end
   end
@@ -38,7 +36,8 @@ rescue PTY::ChildExited
 end
 
 def built_gem_path
-  Dir[File.join($base_dir, "#{$spec.name}-*.gem")].sort_by { |f| File.mtime(f) }.last
+  Dir[File.join($base_dir, "#{$spec.name}-*.gem")]
+    .max_by { |f| File.mtime(f) }
 end
 
 desc "Build #{$spec.name}-#{$spec.version}.gem into the pkg directory"

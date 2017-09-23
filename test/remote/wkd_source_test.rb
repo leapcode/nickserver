@@ -27,14 +27,14 @@ class RemoteWkdSourceTest < CelluloidTest
 
   def assert_pgp_key_in(response)
     json = JSON.parse response.content
-    assert_equal email_with_key.to_s, json['address']
-    refute_empty json['openpgp']
+    assert_equal email_with_key.to_s, json["address"]
+    refute_empty json["openpgp"]
     assert_equal file_content('dewey.pgp.asc'), json['openpgp']
   end
 
   def email_with_key
     uid = 'dewey@test.gnupg.org'
-    email = Nickserver::EmailAddress.new uid
+    Nickserver::EmailAddress.new uid
   end
 
   def source
