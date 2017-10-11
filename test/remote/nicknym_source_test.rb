@@ -63,6 +63,6 @@ class RemoteNicknymSourceTest < CelluloidTest
   end
 
   def email_without_key
-    Nickserver::EmailAddress.new('pleaseneverusethisemailweuseittotest@mail.bitmask.net')
+    Nickserver::EmailAddress.new('neverusethisweuseittotest@mail.bitmask.net')
   end
 end
