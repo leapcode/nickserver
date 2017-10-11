@@ -17,17 +17,18 @@ About nickserver:
 
 * Written in Ruby 2.1, licensed GPLv3
 * Lightweight and scalable (high concurrency, reasonable latency)
-* Uses asynchronous network IO for both server and client connections (via EventMachine)
+* Uses asynchronous network IO for both server and client connections
+  (via Celluloid IO)
 
 API
 ==================================
 
-You query the nickserver via HTTP. The API is very minimal:
+You send requests to nickserver via HTTP. The API is very minimal:
 
     curl -X POST -d address=alice@domain.org https://nicknym.domain.org:6425
 
-The response consists of a signed JSON document with fields for the available
-public keys corresponding to the address.
+The response consists of a JSON document with fields for the selected
+public key corresponding to the address.
 
 For more details, see https://leap.se/nicknym
 
@@ -39,8 +40,6 @@ Requirements
 
 Installation
 ==================================
-
-You have three fine options for installing nickserver:
 
 Install prerequisites
 
