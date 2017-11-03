@@ -33,7 +33,7 @@ class HkpTest < Minitest::Test
     stubbing_http do
       uid = 'leaping_lemur@leap.se'
       stub_sks_vindex_reponse(uid, status: 404)
-      assert_response_status_for_uid uid, 404
+      assert_nil response_for_uid(uid)
     end
   end
 
@@ -41,7 +41,7 @@ class HkpTest < Minitest::Test
     stubbing_http do
       uid = 'leaping_lemur@leap.se'
       stub_sks_vindex_reponse(uid, status: 200)
-      assert_response_status_for_uid uid, 404
+      assert_nil response_for_uid(uid)
     end
   end
 
@@ -51,10 +51,9 @@ class HkpTest < Minitest::Test
     stubbing_http do
       stub_sks_vindex_reponse(uid, body: file_content(:leap_vindex_result))
       stub_sks_get_reponse(key_id, body: file_content(:leap_public_key))
-      assert_response_for_uid(uid) do |response|
-        content = JSON.parse response.content
-        assert_equal file_content(:leap_public_key), content['openpgp']
-      end
+      response = response_for_uid(uid)
+      content = JSON.parse response.content
+      assert_equal file_content(:leap_public_key), content['openpgp']
     end
   end
 
@@ -65,7 +64,7 @@ class HkpTest < Minitest::Test
     stubbing_http do
       stub_sks_vindex_reponse(uid, body: file_content(:leap_vindex_result))
       stub_sks_get_reponse(key_id, status: 404)
-      assert_response_status_for_uid uid, 404
+      assert_equal 404, response_for_uid(uid).status
     end
   end
 
@@ -74,29 +73,20 @@ class HkpTest < Minitest::Test
 
     stubbing_http do
       stub_sks_vindex_reponse(uid, body: file_content(:short_key_vindex_result))
-      assert_response_status_for_uid uid, 500
+      assert_equal 500, response_for_uid(uid).status
     end
   end
 
   protected
 
-  def assert_response_status_for_uid(uid, status)
-    assert_response_for_uid(uid) do |response|
-      assert_equal status, response.status
-    end
-  end
-
-  def assert_response_for_uid(uid)
-    Nickserver::Hkp::Source.new(adapter).query uid do |response|
-      yield response
-    end
+  def response_for_uid(uid)
+    Nickserver::Hkp::Source.new(adapter).query uid
   end
 
   def assert_key_info_for_uid(uid)
-    Nickserver::Hkp::Source.new(adapter).search uid do |status, keys|
-      assert_equal 200, status
-      yield keys
-    end
+    status, keys = Nickserver::Hkp::Source.new(adapter).search uid
+    assert_equal 200, status
+    yield keys
   end
 
   def fetch_key_info(body_source, uid, &block)
