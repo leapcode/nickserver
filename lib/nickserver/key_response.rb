@@ -1,5 +1,5 @@
-module Nickserver::Hkp
-  class Response
+module Nickserver
+  class KeyResponse
     attr_reader :status, :content
 
     def initialize(uid, key)
