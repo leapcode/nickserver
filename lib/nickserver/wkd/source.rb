@@ -1,7 +1,7 @@
 require 'nickserver/source'
 require 'nickserver/response'
 require 'nickserver/wkd/url'
-require 'nickserver/hkp/response'
+require 'nickserver/key_response'
 
 module Nickserver::Wkd
   # Query the web key directory for a given email address
@@ -10,7 +10,7 @@ module Nickserver::Wkd
       url = Url.new(email)
       status, blob = adapter.get url
       if status == 200
-        Nickserver::Hkp::Response.new(email.to_s, armor_key(blob))
+        Nickserver::KeyResponse.new(email.to_s, armor_key(blob))
       end
     end
 

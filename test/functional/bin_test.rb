@@ -33,7 +33,7 @@ class BinTest < Minitest::Test
 
   def assert_command_runs(command)
     out = run_command command
-    assert ($CHILD_STATUS.exitstatus == 0),
+    assert $CHILD_STATUS.exitstatus.zero?,
            "failed to run 'nickserver #{command}':\n #{out}"
   end
 

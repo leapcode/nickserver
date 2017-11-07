@@ -32,7 +32,7 @@ class SampleTest < FunctionalTest
 
   # platform/#8674 handle nonexisting domains
   def test_nicknym_handles_missing_domain
-    assert_lookup_status 404, 'postmaster@now-dont-you-dare-register-this-domain.coop'
+    assert_lookup_status 404, 'postmaster@dont-you-dare-register-this.coop'
   end
 
   def test_no_file_descriptors_leak
@@ -63,7 +63,7 @@ class SampleTest < FunctionalTest
 
   def run_command(command)
     `#{command} 2>&1`.tap do |out|
-      assert ($CHILD_STATUS.exitstatus == 0),
+      assert $CHILD_STATUS.exitstatus.zero?,
              "failed to run '#{command}':\n #{out}"
     end
   end

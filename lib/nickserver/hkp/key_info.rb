@@ -49,7 +49,7 @@ module Nickserver::Hkp
 
     def expirationdate
       expires = properties[4]
-      Time.at(expires.to_i)
+      expires && Time.at(expires.to_i)
     end
 
     def flags

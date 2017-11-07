@@ -19,13 +19,14 @@ require 'json'
 # (2) We actually start the Reelserver on 127.0.0.1 and talk to it via http.
 #     In order to run the Reelserver properly this is a celluloid test.
 #
-# (3) the "Host" header for requests to nickserver must be set (or Config.domain set)
+# (3) the "Host" header for requests to nickserver must be set
+#     (or Config.domain set)
 #
 
 class NickserverTest < CelluloidTest
   include HttpStubHelper
 
-  def test_GET_key_by_email_address_served_via_SKS
+  def test_key_by_email_address_from_sks
     uid    = 'cloudadmin@leap.se'
     key_id = 'E818C478D3141282F7590D29D041EB11B1647490'
     stub_nicknym_available_response 'leap.se', status: 404
@@ -34,51 +35,43 @@ class NickserverTest < CelluloidTest
 
     start do
       params = { query: { 'address' => uid } }
-      get(params) do |response|
-        assert_equal file_content(:leap_public_key), JSON.parse(response.to_s)['openpgp']
-      end
+      assert_responds_to params, key: :leap_public_key
     end
   end
 
-  def test_GET_key_by_fingerprint_served_via_SKS
+  def test_key_by_fingerprint_from_sks
     fingerprint = 'E818C478D3141282F7590D29D041EB11B1647490'
     stub_sks_get_reponse(fingerprint, body: file_content(:leap_public_key))
 
     start do
       params = { query: { 'fingerprint' => fingerprint } }
-      get(params) do |response|
-        assert_equal file_content(:leap_public_key), JSON.parse(response.to_s)['openpgp']
-      end
+      assert_responds_to params, key: :leap_public_key
     end
   end
 
-  def test_GET_served_via_couch_not_found
+  def test_couch_user_not_found
     domain = 'example.org'
     uid    = 'bananas@' + domain
     stub_couch_response(uid, status: 404) do
       start do
         params = { query: { 'address' => uid }, head: { 'Host' => domain } }
-        get(params) do |response|
-          assert_equal 404, response.code
-        end
+        assert_responds_to params, code: 404
       end
     end
   end
 
-  def test_GET_served_via_couch_empty_results
+  def test_couch_empty_results
     domain = 'example.org'
     uid    = 'stompy@' + domain
     stub_couch_response(uid, body: file_content(:empty_couchdb_result)) do
       start do
         params = { query: { 'address' => uid }, head: { host: domain } }
-        get(params) do |response|
-          assert_equal 404, response.code
-        end
+        assert_responds_to params, code: 404
       end
     end
   end
 
-  def test_GET_served_via_couch_success
+  def test_couch_success_response
     domain = 'example.org'
     uid    = 'blue@' + domain
     stub_couch_response(uid, body: file_content(:blue_couchdb_result)) do
@@ -91,7 +84,7 @@ class NickserverTest < CelluloidTest
     end
   end
 
-  def test_GET_empty
+  def test_empty_get
     start do
       get({}) do |response|
         assert_equal "404 Not Found\n", response.to_s
@@ -113,6 +106,16 @@ class NickserverTest < CelluloidTest
     server.terminate if server && server.alive?
   end
 
+  def assert_responds_to(params, key: nil, code: nil)
+    get(params) do |response|
+      assert_equal code, response.code if code
+      if key
+        assert_equal file_content(key),
+                     JSON.parse(response.to_s)['openpgp']
+      end
+    end
+  end
+
   #
   # http GET requests to nickserver
   #
@@ -130,7 +133,8 @@ class NickserverTest < CelluloidTest
   #
   # http request to nickserver
   #
-  # this works because http requests to 127.0.0.1 are not stubbed, but requests to other domains are.
+  # this works because http requests to 127.0.0.1 are not stubbed, but
+  # requests to other domains are.
   #
   def request(method, options = {})
     response = HTTP

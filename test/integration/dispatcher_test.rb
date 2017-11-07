@@ -29,8 +29,9 @@ class Nickserver::DispatcherTest < Minitest::Test
   end
 
   def test_fingerprint_is_not_hex
-    handle fingerprint: ['X36E738D69173C13Z709E44F2F455E2824D18DDX']
-    assert_response error('Fingerprint invalid: X36E738D69173C13Z709E44F2F455E2824D18DDX')
+    fingerprint = 'X36E738D69173C13Z709E44F2F455E2824D18DDX'
+    handle fingerprint: [fingerprint]
+    assert_response error("Fingerprint invalid: #{fingerprint}")
   end
 
   def test_missing_domain
@@ -41,28 +42,32 @@ class Nickserver::DispatcherTest < Minitest::Test
   end
 
   def test_email_via_hkp
-    handle address: ['valid@email.tld'], headers: { 'Host' => 'http://nickserver.me' }
+    handle address: ['valid@email.tld'],
+           headers: { 'Host' => 'http://nickserver.me' }
     stub_nicknym_not_available
     hkp_source.expect :query, success, [Nickserver::EmailAddress]
     assert_response success
   end
 
   def test_email_via_hkp_nicknym_unreachable
-    handle address: ['valid@email.tld'], headers: { 'Host' => 'http://nickserver.me' }
+    handle address: ['valid@email.tld'],
+           headers: { 'Host' => 'http://nickserver.me' }
     stub_nicknym_raises
     hkp_source.expect :query, success, [Nickserver::EmailAddress]
     assert_response success
   end
 
   def test_email_not_found_hkp_nicknym_unreachable
-    handle address: ['valid@email.tld'], headers: { 'Host' => 'http://nickserver.me' }
+    handle address: ['valid@email.tld'],
+           headers: { 'Host' => 'http://nickserver.me' }
     stub_nicknym_raises
     hkp_source.expect :query, nil, [Nickserver::EmailAddress]
     assert_response http_connection_error
   end
 
   def test_email_via_nicknym
-    handle address: ['valid@email.tld'], headers: { 'Host' => 'http://nickserver.me' }
+    handle address: ['valid@email.tld'],
+           headers: { 'Host' => 'http://nickserver.me' }
     nicknym_source.expect :available_for?, true, [String]
     nicknym_source.expect :query, success, [Nickserver::EmailAddress]
     assert_response success

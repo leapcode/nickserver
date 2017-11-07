@@ -1,6 +1,6 @@
 require 'nickserver/source'
 require 'nickserver/response'
-require 'nickserver/hkp/response'
+require 'nickserver/key_response'
 require 'nickserver/hkp/client'
 require 'nickserver/hkp/parse_key_info'
 require 'nickserver/hkp/key_info'
@@ -30,7 +30,7 @@ module Nickserver::Hkp
     def get_key_by_fingerprint(fingerprint, nick = nil)
       status, response = client.get_key_by_fingerprint fingerprint
       if status == 200
-        Response.new nick, response
+        Nickserver::KeyResponse.new nick, response
       else
         Nickserver::Response.new status, 'HKP Request failed'
       end
