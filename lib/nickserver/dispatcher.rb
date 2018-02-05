@@ -13,11 +13,14 @@
 # handler_chain function.
 #
 
+require 'http'
+
 require 'nickserver/request'
 require 'nickserver/handler_chain'
 require 'nickserver/request_handlers/invalid_email_handler'
 require 'nickserver/request_handlers/local_email_handler'
 require 'nickserver/request_handlers/leap_email_handler'
+require 'nickserver/request_handlers/wkd_email_handler'
 require 'nickserver/request_handlers/hkp_email_handler'
 require 'nickserver/request_handlers/fingerprint_handler'
 
@@ -50,6 +53,7 @@ module Nickserver
       chain = HandlerChain.new RequestHandlers::InvalidEmailHandler,
                                RequestHandlers::LocalEmailHandler,
                                RequestHandlers::LeapEmailHandler,
+                               RequestHandlers::WkdEmailHandler,
                                RequestHandlers::HkpEmailHandler,
                                RequestHandlers::FingerprintHandler,
                                proc { proxy_error_response },

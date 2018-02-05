@@ -23,6 +23,10 @@ class SampleTest < FunctionalTest
     assert_lookup_status 200, 'test@mail.bitmask.net'
   end
 
+  def test_wkd_success
+    assert_lookup_status 200, 'info@g10code.com'
+  end
+
   # Regression Tests
 
   # #3 handle missing A records

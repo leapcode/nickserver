@@ -1,4 +1,5 @@
 require 'nickserver/reel_server'
+require 'nickserver/email_address'
 
 module HttpStubHelper
   protected
@@ -46,6 +47,12 @@ module HttpStubHelper
   def stub_couch_response(uid, response = {})
     query = "\?key=#{"%22#{uid}%22"}&reduce=false"
     stub_http_get(/#{Regexp.escape(config.couch_url)}.*#{query}/, response)
+  end
+
+  def stub_wkd_response(uid, response = {})
+    email = Nickserver::EmailAddress.new(uid)
+    url = Nickserver::Wkd::Url.new(email)
+    stub_http_get url, response, Hash
   end
 
   def stub_http_get(url, response, options = nil)

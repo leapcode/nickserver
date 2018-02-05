@@ -8,7 +8,8 @@ module Nickserver::Wkd
   class Source < Nickserver::Source
     def query(email)
       url = Url.new(email)
-      status, blob = adapter.get url
+      status, blob = adapter.get url,
+                                 rescue: 'failed to connect: getaddrinfo'
       if status == 200
         Nickserver::KeyResponse.new(email.to_s, armor_key(blob))
       end
