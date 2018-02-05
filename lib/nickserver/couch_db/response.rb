@@ -26,7 +26,7 @@ module Nickserver::CouchDB
     protected
 
     def key_response
-      format address: nick.to_s, openpgp: key
+      format keys.merge(address: nick.to_s)
     end
 
     def not_found_response
@@ -37,8 +37,15 @@ module Nickserver::CouchDB
       response.to_json
     end
 
-    def key
-      rows.first['value']
+    def keys
+      rows.first['value'].map do |k,v|
+        if k == 'pgp'
+          # created through webapps deprecated API
+          ['openpgp', v]
+        else
+          [k, v['value']]
+        end
+      end.to_h
     end
 
     def ok?
@@ -46,7 +53,7 @@ module Nickserver::CouchDB
     end
 
     def empty?
-      rows.empty?
+      rows.empty? || keys.empty?
     end
 
     def rows

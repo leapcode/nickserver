@@ -9,7 +9,7 @@ module Nickserver::CouchDB
   class Error < StandardError; end
 
   class Source < Nickserver::Source
-    VIEW = '/_design/Identity/_view/pgp_key_by_email'.freeze
+    VIEW = '/_design/Identity/_view/keys_by_email'.freeze
     UNEXPECTED_RESPONSE_CODES = [401, 500].freeze
 
     def query(nick)
