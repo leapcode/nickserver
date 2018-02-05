@@ -13,6 +13,11 @@ module Nickserver::Wkd
       "https://#{domain}/.well-known/openpgpkey/hu/#{encoded_digest}"
     end
 
+    # needed to compare when used as an arg calling a test mock
+    def ==(other)
+      self.to_s == other.to_s
+    end
+
     protected
 
     attr_reader :domain, :local_part

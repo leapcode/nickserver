@@ -37,30 +37,31 @@ class Nickserver::DispatcherTest < Minitest::Test
   def test_missing_domain
     handle address: ['valid@email.tld']
     stub_nicknym_not_available
-    hkp_source.expect :query, success, [Nickserver::EmailAddress]
+    wkd_source.expect :query, success, [Nickserver::EmailAddress]
     assert_response success
   end
 
-  def test_email_via_hkp
+  def test_email_via_wkd
     handle address: ['valid@email.tld'],
            headers: { 'Host' => 'http://nickserver.me' }
     stub_nicknym_not_available
-    hkp_source.expect :query, success, [Nickserver::EmailAddress]
+    wkd_source.expect :query, success, [Nickserver::EmailAddress]
     assert_response success
   end
 
-  def test_email_via_hkp_nicknym_unreachable
+  def test_email_via_wkd_nicknym_unreachable
     handle address: ['valid@email.tld'],
            headers: { 'Host' => 'http://nickserver.me' }
     stub_nicknym_raises
-    hkp_source.expect :query, success, [Nickserver::EmailAddress]
+    wkd_source.expect :query, success, [Nickserver::EmailAddress]
     assert_response success
   end
 
-  def test_email_not_found_hkp_nicknym_unreachable
+  def test_email_not_found_wkd_nicknym_unreachable
     handle address: ['valid@email.tld'],
            headers: { 'Host' => 'http://nickserver.me' }
     stub_nicknym_raises
+    wkd_source.expect :query, nil, [Nickserver::EmailAddress]
     hkp_source.expect :query, nil, [Nickserver::EmailAddress]
     assert_response http_connection_error
   end
@@ -90,12 +91,18 @@ class Nickserver::DispatcherTest < Minitest::Test
 
   def assert_response(response)
     Nickserver::Nicknym::Source.stub :new, nicknym_source do
-      Nickserver::Hkp::Source.stub :new, hkp_source do
-        responder.expect :respond, nil, [response.status, response.content]
-        dispatcher.respond_to @params, @headers
-        responder.verify
+      Nickserver::Wkd::Source.stub :new, wkd_source do
+        Nickserver::Hkp::Source.stub :new, hkp_source do
+          responder.expect :respond, nil, [response.status, response.content]
+          dispatcher.respond_to @params, @headers
+          responder.verify
+        end
       end
     end
+  end
+
+  def wkd_source
+    @wkd_source ||= Minitest::Mock.new
   end
 
   def hkp_source
